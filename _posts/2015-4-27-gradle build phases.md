@@ -11,11 +11,12 @@ One of them can serve to decribe one of Gradle's fundamental aspects - Build Pha
 
 Let's assume
 
-**requirement:** create version.info file with current build version included and add it to built jar  
+**requirement:** supply jar archive with version.info file containing current build version  
 **solution:**
 
 ```groovy
 /* build.gradle */
+
 apply plugin: 'java'
 
 ext.buildVersion = "1.01-${new Date().format('yyMMddHHmmss')}"
@@ -30,21 +31,26 @@ jar {
 }
 ```
 
+
 Running **gradle build** shows that everything works as expected. Work is done and developer victorious,
 but only until another task is run: **gradle test**
-with unexpected outcome: new version.info created though no jar file was built.
+with unexpected outcome: new **version.info** created though no jar file was built.
 
 With **gradle build** it's trivial cause **build** task indirectly depends on **createVersionFile** task
+
 ![gradle build dependencies]({{ site.baseurl }}/images//2015-4-27-gradle-build-phases/gradle-build-tr.png "gradle build dependencies")
 
+
 But suprisingly with 'gradle test' no scuh dependency is found.
+
 ![gradle test dependencies]({{ site.baseurl }}/images//2015-4-27-gradle-build-phases/gradle-test-tr.png "gradle test dependencies")
+
 
 For experienced gradle user mistake in the script is easy to spot (will be shown at the end),
 but still it's not that obvious what has happened.
 
-Gradle has two build phases (actually three, but we'll skip initialization)
-- **Configuration** - where all the project objects are configured **=** where the given gradle groovy script is read and executed to build the model
+Gradle has two build phases (actually three, but we'll skip initialization)  
+- **Configuration** - where all the project objects are configured **=** where the given gradle groovy script is read and executed to build the model  
 - **Execution** - where from the model (built in the previous phase) only subset of tasks is executed 
 
 In our **gradle test** case - version file should have been created on execution phase - but beacause of simple mistake - was done already on configuration.
@@ -54,6 +60,7 @@ After applying **java plugin** and setting **buildVersion**, **createVersionFile
 What for people not familiar with groovy syntax may look like java method definition is actually execution of task method with two arguments:
 **taskName** and **closure**.
 This part - beacuse of groovy flexibility - may be rewritten as:
+
 ```groovy
 task (
         createVersionFile, // first argument - taskName
@@ -77,6 +84,7 @@ as the task was created and not later when on it's execution.
 
 Gradle tasks ared designed as collections of Actions (executed on Execution phase), that can be added with doLast() method:,
 so in our case proper configuration will be:
+
 ```groovy
 task createVersionFile {
     doLast {
@@ -89,6 +97,7 @@ Here
 - task method was executed again on **Project** delegate,
 - closure was passed to new task's configuration, but this time it was the doLast() method - executed with one argument: closure - which was stored as the new action,
 all of which can be seen in 
+
 ```java
 /* org.gradle.api.internal.AbstractTask */
 public Task doLast(final Closure action) {
@@ -97,8 +106,10 @@ public Task doLast(final Closure action) {
 	(...)
 }
 ```
+
 It must also be mentioned that **doLast()** method is so popular that there is a shortcut to it - **leftShift(final Closure action)** - also to be found in **AbstractTask** class,
 so **createVersionFile** task creation can be rewritten simply as:
+
 ```java
 task createVersionFile << {
     ant.echo(message: "${buildVersion}", file: "${buildDir}/version.info")
