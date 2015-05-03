@@ -35,12 +35,12 @@ Running **gradle build** shows that everything works as expected. Work is done a
 but only until another task is run: **gradle test**
 with unexpected outcome: new **version.info** created though no jar file was built.
 
-With **gradle build** it's trivial cause **build** task indirectly depends on **createVersionFile** task
+With **gradle build** situation is trivial cause **build** task indirectly depends on **createVersionFile** task
 
 ![gradle build dependencies]({{ site.baseurl }}/images//2015-4-27-gradle-build-phases/gradle-build-tr.png "gradle build dependencies")
   
 
-But suprisingly with 'gradle test' no scuh dependency is found.
+But suprisingly with **gradle test** no such dependency exists.
 
 ![gradle test dependencies]({{ site.baseurl }}/images//2015-4-27-gradle-build-phases/gradle-test-tr.png "gradle test dependencies")  
   
@@ -56,7 +56,7 @@ In our **gradle test** case - version file should have been created on execution
 
 Configuration phase is about executing groovy script found in **build.gradle** - let's see what was done here.  
 After applying **java plugin** and setting **buildVersion**, **createVersionFile** task is created.  
-What for people not familiar with groovy syntax may look like java method definition, is actually execution of task method with two arguments: **taskName** and **closure**.  
+What for people not familiar with groovy syntax may look like java method definition, is actually execution of **task()** method with two arguments: **taskName** and **closure**.  
 This part - beacuse of groovy flexibility - may be rewritten as:  
   
   
@@ -82,7 +82,7 @@ public Task task(String task, Closure configureClosure) {
   
 
 As we can see closure is immediately executed on new task to configure it - that's why the version file was executed as soon,
-as the task was created and not later when on it's execution.
+as the task was created and not later on it's execution.
 
 Gradle tasks ared designed as collections of Actions (executed on Execution phase), that can be added with **doLast()** method:,
 so in our case proper configuration will be:
@@ -105,6 +105,7 @@ all of which can be seen in
   
 ```java
 /* org.gradle.api.internal.AbstractTask */
+
 public Task doLast(final Closure action) {
 	(...)
 	actions.add(convertClosureToAction(action));
