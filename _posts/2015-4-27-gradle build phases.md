@@ -42,11 +42,11 @@ With **gradle build** it's trivial cause **build** task indirectly depends on **
 
 But suprisingly with 'gradle test' no scuh dependency is found.
 
-![gradle test dependencies]({{ site.baseurl }}/images//2015-4-27-gradle-build-phases/gradle-test-tr.png "gradle test dependencies")
+![gradle test dependencies]({{ site.baseurl }}/images//2015-4-27-gradle-build-phases/gradle-test-tr.png "gradle test dependencies")  
   
   
 For experienced gradle user mistake in the script is easy to spot (will be shown at the end),
-but still it's not that obvious what has happened.
+but still it's not that obvious what has happened.  
 
 Gradle has two build phases (actually three, but we'll skip initialization)  
 - **Configuration** - where all the project objects are configured **=** where the given gradle groovy script is read and executed to build the model  
@@ -56,19 +56,18 @@ In our **gradle test** case - version file should have been created on execution
 
 Configuration phase is about executing groovy script found in **build.gradle** - let's see what was done here.  
 After applying **java plugin** and setting **buildVersion**, **createVersionFile** task is created.  
-What for people not familiar with groovy syntax may look like java method definition, is actually execution of task method with two arguments:  
-**taskName** and **closure**.  
+What for people not familiar with groovy syntax may look like java method definition, is actually execution of task method with two arguments: **taskName** and **closure**.  
 This part - beacuse of groovy flexibility - may be rewritten as:  
   
-
+  
 ```groovy
 task (
         createVersionFile, // first argument - taskName
         {ant.echo(message: "${buildVersion}", file: "${buildDir}/version.info")} // second argument - closure
 )
-```
+```  
   
-
+  
 Groovy script is executed on **Project** delegate, 
 whose most logic is handled by **org.gradle.api.internal.project.AbstractProject** class, where we can found method
     
@@ -79,7 +78,7 @@ public Task task(String task, Closure configureClosure) {
 				.create(task)	// new task created
 				.configure(configureClosure);	// closure executed on Task delegate
 }
-```
+```  
   
 
 As we can see closure is immediately executed on new task to configure it - that's why the version file was executed as soon,
@@ -100,10 +99,10 @@ task createVersionFile {
 
 Here  
 - task method was executed again on **Project** delegate,  
-- closure was passed to new task's configuration, but this time it was the doLast() method - executed with one argument: closure - which was stored as the new action,
-all of which can be seen in 
+- closure was passed to new task's configuration, but this time it was the *doLast()* method, executed with one argument: closure, which was stored as the new action,
+all of which can be seen in  
   
-
+  
 ```java
 /* org.gradle.api.internal.AbstractTask */
 public Task doLast(final Closure action) {
@@ -111,20 +110,20 @@ public Task doLast(final Closure action) {
 	actions.add(convertClosureToAction(action));
 	(...)
 }
-```
+```  
   
-
+  
 It must also be mentioned that **doLast()** method is so popular that there is a shortcut to it - **leftShift(final Closure action)** - also to be found in **AbstractTask** class,
-so **createVersionFile** task creation can be rewritten simply as:
+so **createVersionFile** task creation can be rewritten simply as:  
   
-
+  
 ```java
 task createVersionFile << {
     ant.echo(message: "${buildVersion}", file: "${buildDir}/version.info")
 }
-```
+```  
   
-
+  
 And now everything works as suppose to.
 
 ****
