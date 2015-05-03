@@ -30,7 +30,7 @@ jar {
     from fileTree(dir: "${buildDir}", include: 'version.info')
 }
 ```  
-
+  
 Running **gradle build** shows that everything works as expected. Work is done and developer victorious,
 but only until another task is run: **gradle test**
 with unexpected outcome: new **version.info** created though no jar file was built.
@@ -44,7 +44,7 @@ But suprisingly with 'gradle test' no scuh dependency is found.
 
 ![gradle test dependencies]({{ site.baseurl }}/images//2015-4-27-gradle-build-phases/gradle-test-tr.png "gradle test dependencies")
   
-
+  
 For experienced gradle user mistake in the script is easy to spot (will be shown at the end),
 but still it's not that obvious what has happened.
 
