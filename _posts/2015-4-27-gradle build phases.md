@@ -6,13 +6,14 @@ title: Gradle Build Phases
 Always hungry for changes, some time ago 4F company moved from Maven to Gradle.
 Most of the migration work went relatively smoothly.
 Surprisingly though, not every developer was eager to sacrifice his precious time on something as trival as build tools and
-with rapid googling for example based knowledge some mistates were made.
+with rapid googling for example based knowledge some mistates were made.  
 One of them can serve to decribe one of Gradle's fundamental aspects - Build Phases.
 
 Let's assume
 
-requirement: create version.info file with current build version included and add it to built jar
-solution:
+**requirement:** create version.info file with current build version included and add it to built jar  
+**solution:**
+
 ```groovy
 /* build.gradle */
 apply plugin: 'java'
@@ -28,6 +29,7 @@ jar {
     from fileTree(dir: "${buildDir}", include: 'version.info')
 }
 ```
+
 Running **gradle build** shows that everything works as expected. Work is done and developer victorious,
 but only until another task is run: **gradle test**
 with unexpected outcome: new version.info created though no jar file was built.
