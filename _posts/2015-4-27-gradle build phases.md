@@ -29,8 +29,7 @@ jar {
     dependsOn createVersionFile
     from fileTree(dir: "${buildDir}", include: 'version.info')
 }
-```
-
+```  
 
 Running **gradle build** shows that everything works as expected. Work is done and developer victorious,
 but only until another task is run: **gradle test**
@@ -39,12 +38,12 @@ with unexpected outcome: new **version.info** created though no jar file was bui
 With **gradle build** it's trivial cause **build** task indirectly depends on **createVersionFile** task
 
 ![gradle build dependencies]({{ site.baseurl }}/images//2015-4-27-gradle-build-phases/gradle-build-tr.png "gradle build dependencies")
-
+  
 
 But suprisingly with 'gradle test' no scuh dependency is found.
 
 ![gradle test dependencies]({{ site.baseurl }}/images//2015-4-27-gradle-build-phases/gradle-test-tr.png "gradle test dependencies")
-
+  
 
 For experienced gradle user mistake in the script is easy to spot (will be shown at the end),
 but still it's not that obvious what has happened.
@@ -53,13 +52,14 @@ Gradle has two build phases (actually three, but we'll skip initialization)
 - **Configuration** - where all the project objects are configured **=** where the given gradle groovy script is read and executed to build the model  
 - **Execution** - where from the model (built in the previous phase) only subset of tasks is executed 
 
-In our **gradle test** case - version file should have been created on execution phase - but beacause of simple mistake - was done already on configuration.
+In our **gradle test** case - version file should have been created on execution phase - but beacause of the simple mistake - was done already on configuration.
 
-Configuration phase is about executing groovy script found in **build.gradle** - let's see what was done here.
-After applying **java plugin** and setting **buildVersion**, **createVersionFile** task is created.
-What for people not familiar with groovy syntax may look like java method definition is actually execution of task method with two arguments:
-**taskName** and **closure**.
+Configuration phase is about executing groovy script found in **build.gradle** - let's see what was done here.  
+After applying **java plugin** and setting **buildVersion**, **createVersionFile** task is created.  
+What for people not familiar with groovy syntax may look like java method definition, is actually execution of task method with two arguments:  
+**taskName** and **closure**.  
 This part - beacuse of groovy flexibility - may be rewritten as:
+  
 
 ```groovy
 task (
@@ -70,6 +70,7 @@ task (
 
 Groovy script is executed on **Project** delegate, 
 whose most logic is handled by **org.gradle.api.internal.project.AbstractProject** class, where we can found method
+  
 
 ```java
 public Task task(String task, Closure configureClosure) {
@@ -78,12 +79,14 @@ public Task task(String task, Closure configureClosure) {
 				.configure(configureClosure);	// closure executed on Task delegate
 }
 ```
+  
 
 As we can see closure is immediately executed on new task to configure it - that's why the version file was executed as soon,
 as the task was created and not later when on it's execution.
 
-Gradle tasks ared designed as collections of Actions (executed on Execution phase), that can be added with doLast() method:,
+Gradle tasks ared designed as collections of Actions (executed on Execution phase), that can be added with **doLast()** method:,
 so in our case proper configuration will be:
+  
 
 ```groovy
 task createVersionFile {
@@ -92,11 +95,13 @@ task createVersionFile {
     }
 }
 ```
+  
 
-Here 
-- task method was executed again on **Project** delegate,
+Here  
+- task method was executed again on **Project** delegate,  
 - closure was passed to new task's configuration, but this time it was the doLast() method - executed with one argument: closure - which was stored as the new action,
 all of which can be seen in 
+  
 
 ```java
 /* org.gradle.api.internal.AbstractTask */
@@ -106,15 +111,18 @@ public Task doLast(final Closure action) {
 	(...)
 }
 ```
+  
 
 It must also be mentioned that **doLast()** method is so popular that there is a shortcut to it - **leftShift(final Closure action)** - also to be found in **AbstractTask** class,
 so **createVersionFile** task creation can be rewritten simply as:
+  
 
 ```java
 task createVersionFile << {
     ant.echo(message: "${buildVersion}", file: "${buildDir}/version.info")
 }
 ```
+  
 
 And now everything works as suppose to.
 
