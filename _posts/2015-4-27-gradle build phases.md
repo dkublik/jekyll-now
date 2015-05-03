@@ -7,12 +7,12 @@ Always hungry for changes, some time ago 4F company moved from Maven to Gradle.
 Most of the migration work went relatively smoothly.
 Surprisingly though, not every developer was eager to sacrifice his precious time on something as trival as build tools and
 with rapid googling for example based knowledge some mistates were made.  
-One of them can serve to decribe one of Gradle's fundamental aspects - Build Phases.
-
-Let's assume
+One of them can serve to decribe one of Gradle's fundamental aspects - **Build Phases**.  
+  
+Let's assume  
 
 **requirement:** supply jar archive with version.info file containing current build version  
-**solution:**
+**solution:**  
 
 ```groovy
 /* build.gradle */
