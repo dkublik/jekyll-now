@@ -58,7 +58,7 @@ Configuration phase is about executing groovy script found in **build.gradle** -
 After applying **java plugin** and setting **buildVersion**, **createVersionFile** task is created.  
 What for people not familiar with groovy syntax may look like java method definition, is actually execution of task method with two arguments:  
 **taskName** and **closure**.  
-This part - beacuse of groovy flexibility - may be rewritten as:
+This part - beacuse of groovy flexibility - may be rewritten as:  
   
 
 ```groovy
@@ -67,10 +67,11 @@ task (
         {ant.echo(message: "${buildVersion}", file: "${buildDir}/version.info")} // second argument - closure
 )
 ```
+  
 
 Groovy script is executed on **Project** delegate, 
 whose most logic is handled by **org.gradle.api.internal.project.AbstractProject** class, where we can found method
-  
+    
 
 ```java
 public Task task(String task, Closure configureClosure) {
