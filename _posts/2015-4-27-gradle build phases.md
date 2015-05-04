@@ -6,7 +6,7 @@ title: Gradle Build Phases
 Always hungry for changes, some time ago 4F company moved from Maven to Gradle.
 Most of the migration work went relatively smoothly.
 Surprisingly though, not every developer was eager to sacrifice his precious time on something as trival as build tools and
-with rapid googling for example based knowledge some mistates were made.  
+with rapid googling for example based knowledge some mistakes were made.  
 One of them can serve to decribe one of Gradle's fundamental aspects - **Build Phases**.  
   
 Let's assume  
@@ -52,7 +52,7 @@ Gradle has two build phases (actually three, but we'll skip initialization)
 - **Configuration** - where all the project objects are configured **=** where the given gradle groovy script is read and executed to build the model  
 - **Execution** - where from the model (built in the previous phase) only subset of tasks is executed 
 
-In our **gradle test** case - version file should have been created on execution phase - but beacause of the simple mistake - was done already on configuration.
+In our **gradle test** case - version file wasn't created on execution phase - but beacause of the simple mistake - already on configuration.
 
 Configuration phase is about executing groovy script found in **build.gradle** - let's see what was done here.  
 After applying **java plugin** and setting **buildVersion**, **createVersionFile** task is created.  
