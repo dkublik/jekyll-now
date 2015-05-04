@@ -62,8 +62,8 @@ This part - beacuse of groovy flexibility - may be rewritten as:
   
 ```groovy
 task (
-        createVersionFile, // first argument - taskName
-        {ant.echo(message: "${buildVersion}", file: "${buildDir}/version.info")} // second argument - closure
+	createVersionFile, // first argument - taskName
+	{ant.echo(message: "${buildVersion}", file: "${buildDir}/version.info")} // second argument - closure
 )
 ```  
   
@@ -75,8 +75,8 @@ whose most logic is handled by **org.gradle.api.internal.project.AbstractProject
 ```java
 public Task task(String task, Closure configureClosure) {
 	return taskContainer
-				.create(task)	// new task created
-				.configure(configureClosure);	// closure executed on Task delegate
+			.create(task)	// new task created
+			.configure(configureClosure);	// closure executed on Task delegate
 }
 ```  
   
@@ -126,7 +126,7 @@ task createVersionFile << {
   
   
 And now everything works as suppose to.
-
+<br/>
 ****
 
 
