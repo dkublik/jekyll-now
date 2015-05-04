@@ -9,9 +9,7 @@ Surprisingly though, not every developer was eager to sacrifice his precious tim
 with rapid googling for example based knowledge some mistakes were made.  
 One of them can serve to decribe one of Gradle's fundamental aspects - **Build Phases**.  
 
-&nbsp;
-
-Let's assume  
+#### Problem
 
 **requirement:** supply jar archive with version.info file containing current build version  
 **solution:**  
@@ -54,9 +52,9 @@ But suprisingly with **gradle test** no such dependency exists.
 For experienced gradle user mistake in the script is easy to spot (will be shown at the end),
 but still it's not that obvious what has happened.  
 
-&nbsp;
+#### Build Phases
 
-Gradle has two build phases (actually three, but we'll skip initialization)  
+Gradle has two [build phases](http://gradle.org/docs/current/userguide/build_lifecycle.html) (actually three, but we'll skip initialization)  
 - **Configuration** - where all the project objects are configured **=** where the given gradle groovy script is read and executed to build the model  
 - **Execution** - where from the model (built in the previous phase) only subset of tasks is executed 
 
@@ -89,7 +87,7 @@ public Task task(String task, Closure configureClosure) {
 As we can see closure is immediately executed on new task to configure it - that's why the version file was executed as soon,
 as the task was created and not later on it's execution.
 
-&nbsp;
+#### Actions
 
 Gradle tasks ared designed as collections of Actions (executed on Execution phase), that can be added with **doLast()** method:,
 so in our case proper configuration will be:
@@ -117,7 +115,7 @@ public Task doLast(final Closure action) {
 }
 ```  
 
-&nbsp;
+#### Final Solution
 
 It must also be mentioned that **doLast()** method is so popular that there is a shortcut to it - **leftShift(final Closure action)** - also to be found in **AbstractTask** class,
 so **createVersionFile** task creation can be rewritten simply as:  
