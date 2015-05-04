@@ -78,8 +78,6 @@ task (
 Groovy script is executed on **Project** delegate, 
 whose most logic is handled by **org.gradle.api.internal.project.AbstractProject** class, where we can found method
 
-&nbsp;
-
 ```java
 public Task task(String task, Closure configureClosure) {
 	return taskContainer
