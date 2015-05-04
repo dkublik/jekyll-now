@@ -4,9 +4,9 @@ title: About
 permalink: /about/
 ---
 
-Dawid Kublik
-Senior Java Developer @ 4FinanceIT
-more - ToBeDescribed
+Dawid Kublik  
+Senior Java Developer @ 4FinanceIT  
+more - ToBeDescribed  
 
 ### More Information
 
