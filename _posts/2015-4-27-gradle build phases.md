@@ -125,8 +125,9 @@ task createVersionFile << {
 ```  
   
   
-And now everything works as suppose to.
-<br/>
+And now everything works as suppose to. 
+
+&nbsp;
 ****
 
 
