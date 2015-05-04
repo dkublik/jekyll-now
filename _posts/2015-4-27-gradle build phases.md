@@ -8,7 +8,8 @@ Most of the migration work went relatively smoothly.
 Surprisingly though, not every developer was eager to sacrifice his precious time on something as trival as build tools and
 with rapid googling for example based knowledge some mistakes were made.  
 One of them can serve to decribe one of Gradle's fundamental aspects - **Build Phases**.  
-  
+
+&nbsp;
 Let's assume  
 
 **requirement:** supply jar archive with version.info file containing current build version  
@@ -35,16 +36,17 @@ Running **gradle build** shows that everything works as expected. Work is done a
 but only until another task is run: **gradle test**
 with unexpected outcome: new **version.info** created though no jar file was built.
 
+&nbsp;
 With **gradle build** situation is trivial cause **build** task indirectly depends on **createVersionFile** task
 
 ![gradle build dependencies]({{ site.baseurl }}/images//2015-4-27-gradle-build-phases/gradle-build-tr.png "gradle build dependencies")
-  
 
+&nbsp;
 But suprisingly with **gradle test** no such dependency exists.
 
 ![gradle test dependencies]({{ site.baseurl }}/images//2015-4-27-gradle-build-phases/gradle-test-tr.png "gradle test dependencies")  
-  
-  
+
+&nbsp;
 For experienced gradle user mistake in the script is easy to spot (will be shown at the end),
 but still it's not that obvious what has happened.  
 
