@@ -22,7 +22,7 @@ When I was expecting to see some Mongo magic all I got was another tutorial for 
 Don't get me wrong - it's all cool and everything but everyone knows it for some time now, and many presenters acted liked they were revealing some mysteries to us - when in fact - almost no one was.
 I was little disappointed by that - cause seeing some magic was what I was secretly hoping for.
 I grow little tired with mere basics on other conferences - and hoped - that under wings of Pivotal - I'll finally see how things are handled in leading projects and leading companies, hear about their problems, solutions and real live experience.
-Instead - in most cases - I got what can be found in basic tutorials. 
+Instead - in most cases - I got what can be found in basic tutorials.  
 There were some pearls of course - ["Inside an Spring Event Sourced CQRS application – or why Microservices can actually work"](http://www.springio.net/inside-an-spring-event-sourced-cqrs-application-or-why-microservices-can-actually-work/) - showing step by step evolution of monolithic application to inevitable end as (almost) microservice solution or ["Everything you need to know about Java Classloaders"](http://www.springio.net/everything-you-need-to-know-about-java-classloaders/) where Oleg Šelajev presented exception by exception what can go wrong behind jvm classloaders curtains.
 But the presentation I liked most was
 
