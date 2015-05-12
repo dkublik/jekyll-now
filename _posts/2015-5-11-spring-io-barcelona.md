@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Spring I/O 2015 Barcelona
+comments: true
 ---
 
 Few days ago 4F company gave me an opportunity to participate in Spring I/O conference in Barcelona.  
