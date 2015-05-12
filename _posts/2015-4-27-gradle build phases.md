@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Gradle Build Phases
+comments: true
 ---
 
 Always hungry for changes, some time ago 4F company moved from Maven to Gradle.
