@@ -5,7 +5,8 @@ comments: true
 ---
 
 Amsterdam gave me a taste of everything - I guess this is what this city is about :).  
-Organizers clearly 
+Organizers clearly  
+
 + knew how to please participants (city central location, very good catering, unlimited beers after speeches),
 + knew how to drag our attention (drones, lot's of t-shirts and other gadgets to give away),
 + knew how to organize schedule so everyone can find something for himself.
@@ -24,15 +25,19 @@ Getting back to Booking.com and Spotify - two presentations, describing real lif
 And I do remember both of them mostly because of data volumes they mentioned.  
 I know that logging and gathering the data is important, but was totally impressed by booking.com volumes: **15K events / s** and **100GB / h** of data to be stored.  
 It's a lot to process and a lot to track. Damien reminded us of the importance of visualisation showing their graphs and dashboards.
-Also showed that with that volume of data we need to rediscover things that we took for granted: json may not be efficient enough in communication, events may need to be aggregated before storing, data distribution encounters network capacity problems.  
+Also showed that with that volume of data we need to rediscover things that we took for granted: json may not be efficient enough in communication, events may need to be aggregated before storing, data distribution encounters network capacity problems.
 
 ![Events storage and analysis with Riak at Booking.com]({{ site.baseurl }}/images/2015-06-30-amsterdam-goto/booking.jpg "Events storage and analysis with Riak at Booking.com")
+
+&nbsp;
 
 Still being under the impression of Booking.com presentation I was totally astonished with Spotify volume: **400TB of data generated per day!!!**  
 So what can they do with that amount of data? Josh and Rafał were kind to explain.
 For once - they can learn user's behaviour and adopt their services. It's obvious that spotify gives song proposals based on your historic choices but also learns you behaviour - that you may prefer hard rock during morning jogging, jazz at a lunch time and classical music when laying in bed. They choose commercials so they are in the same mood like the music you are listening to and with newest feature they can propose your favourite songs matched to your speed rate when running. The power of data.
 
 ![The Evolution of Hadoop at Spotify - Through Failures and Pain]({{ site.baseurl }}/images/2015-06-30-amsterdam-goto/spotify.jpg "The Evolution of Hadoop at Spotify - Through Failures and Pain")
+
+&nbsp;
 
 #### Summary
 
