@@ -47,7 +47,7 @@ That knowledge was really worth acquiring. I wonder how many hours I would spend
 #### Summary
 Spring I/O - I liked it. How could one not. With everything above said it was worth seeing. I do realize that I'm one of the luckies. My company aims for new technologies and is open for new ideas. We are always in chase for changes, but I do know that not everyone is. For some - presented things could open new perspectives. For those of us already familiar with it - it's still good to know that you are on the right track.
 
-![Lunch brake]({{ site.baseurl }}/images/2015-04-11-springio/hotel_1.jpg "Lunch brake")
+![Lunch break]({{ site.baseurl }}/images/2015-04-11-springio/hotel_1.jpg "Lunch break")
 
 &nbsp;
 ****
