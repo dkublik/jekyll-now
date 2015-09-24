@@ -44,7 +44,7 @@ This is clearly not what is happening in our case, but to undersand it we need t
 
 #### Context
 
-#1. The whole case is about some file processing. There is a _FileProcessor_ with _@Transactional_ _processFile()_ method, which publishes application event when processing is done.
+*1. The whole case is about some file processing. There is a _FileProcessor_ with _@Transactional_ _processFile()_ method, which publishes application event when processing is done.
  
 ```java
 /* FileProcessor */
@@ -58,7 +58,7 @@ This is clearly not what is happening in our case, but to undersand it we need t
 
 &nbsp;
 
-#2. _EventPublisher_ uses _spring_ _ApplicationEventPublisher_ but does a little more. Someone figured out that it will check if a transaction is present and
+*2. _EventPublisher_ uses _spring_ _ApplicationEventPublisher_ but does a little more. Someone figured out that it will check if a transaction is present and
 	- if it is - it will publish after commit
 	- if not - it will publish immediately
 
@@ -95,7 +95,7 @@ This is clearly not what is happening in our case, but to undersand it we need t
 
 &nbsp;
 	
-#3. _FileProcessedEvent_ is handled by _SummaryMaker.createSummary(FileProcessedEvent event)_ - the method we've already seen.
+*3. _FileProcessedEvent_ is handled by _SummaryMaker.createSummary(FileProcessedEvent event)_ - the method we've already seen.
 
 The _createSummary()_ method needs a transaction as well, so here is what is expected:
 - _processFile()_ publishes an event
