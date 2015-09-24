@@ -100,10 +100,11 @@ this is how it looks in the code:
 3) _FileProcessedEvent_ is handled by _SummaryMaker.createSummary(FileProcessedEvent event)_ - the method we've already seen.
 
 The _createSummary()_ method needs a transaction as well, so here is what is expected:
-  - _processFile()_ publishes an event
-  - _EventPublisher_ sees that there is an active transaction (_createSummary()_ is not finished yet) so it waits for the commit.
-  - after the commit, when transaction is finished, event is published
-  - event is handled by _SummaryMaker.createSummary()_ in the scope of a new transaction.
+
++ _processFile()_ publishes an event
++ _EventPublisher_ sees that there is an active transaction (_createSummary()_ is not finished yet) so it waits for the commit.
++ after the commit, when transaction is finished, event is published
++ event is handled by _SummaryMaker.createSummary()_ in the scope of a new transaction.
 
 And of course again - this is not what is happening.
 
@@ -138,7 +139,7 @@ so what we achived with our code was:
 #### Solution
 
 Understanding what happened, we now can see that the solution is simple - we shouldn't join the existing transaction,
-and to achieve it we only need to change propagation to _REQUIRES_NEW_ in _SummaryMaker_
+and to achieve it we only need to change propagation to *REQUIRES_NEW* in _SummaryMaker_
 
 ```java
 /* SummaryMaker */
