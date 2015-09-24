@@ -59,10 +59,10 @@ This is clearly not what is happening in our case, but to undersand it we need t
 &nbsp;
 
 2) _EventPublisher_ uses _spring_ _ApplicationEventPublisher_ but does a little more. Someone figured out that it will check if a transaction is present and
-	- if it is - it will publish after commit
-	- if not - it will publish immediately
+  - if it is - it will publish after commit
+  - if not - it will publish immediately  
 
-	I can think about two reasons for such a solution:
+I can think about two reasons for such a solution:
   - to make the transaction as quick as possible
   - to make sure all the data are already in db, since event may be handled outside the scope of current transaction
 		
@@ -98,12 +98,14 @@ This is clearly not what is happening in our case, but to undersand it we need t
 3) _FileProcessedEvent_ is handled by _SummaryMaker.createSummary(FileProcessedEvent event)_ - the method we've already seen.
 
 The _createSummary()_ method needs a transaction as well, so here is what is expected:
-	- _processFile()_ publishes an event
-	- _EventPublisher_ sees that there is an active transaction (_createSummary()_ is not finished yet) so it waits for the commit.
-	- after the commit, when transaction is finished, event is published
-	- event is handled by _SummaryMaker.createSummary()_ in the scope of a new transaction.
+  - _processFile()_ publishes an event
+  - _EventPublisher_ sees that there is an active transaction (_createSummary()_ is not finished yet) so it waits for the commit.
+  - after the commit, when transaction is finished, event is published
+  - event is handled by _SummaryMaker.createSummary()_ in the scope of a new transaction.
 
 And of course again - this is not what is happening.
+
+&nbsp;
 
 #### What is happening
 
@@ -112,10 +114,10 @@ The error assumption is that transaction ends immediately after a commit, when i
 To be notified about commit we registered _TransactionSynchronization_.
 If we examine _org.springframework.transaction.support.AbstractPlatformTransactionMan.processCommit(DefaultTransactionStatus status)_
 we will see the following steps:
-	- before commit actions
-	- actual commit
-	- after commit actions - where our registered synchronization is called and event is fired.
-	- cleanup - where transaction is finished (removed from thread local and stops being active)
+  - before commit actions
+  - actual commit
+  - after commit actions - where our registered synchronization is called and event is fired.
+  - cleanup - where transaction is finished (removed from thread local and stops being active)
 
 so what we achived with our code was:
 
@@ -146,6 +148,8 @@ and to achieve it we only need to change propagation to REQUIRES_NEW in _Summary
 ```  
 
 ![corrected transaction flow]({{ site.baseurl }}/images//2015-09-2-transactions-trouble/trans3.png "corrected transaction flow")
+
+&nbsp;
 
 &nbsp;
 ****
