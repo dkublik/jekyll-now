@@ -4,9 +4,9 @@ title: Transaction Troubles
 comments: true
 ---
 
-#### Problem
+Recently I've faced an interesting issue. Got transactional method saving entity to the database - method is called, no exception is thrown - but no data is stored to the db.
 
-Recently I've faced an interesting. Got transactional method saving entity to the database - method is called, no exception is thrown - but no data is stored to the db.
+&nbsp;
 
 ```java
 /* SummaryMaker */
@@ -20,14 +20,15 @@ Recently I've faced an interesting. Got transactional method saving entity to th
     }
 ```  
 
-_@Transactional_ is from the Spring framework and repo is _spring-data-jpa_ - so even if there was not atcive transaction then _SimpleJpaRepository_ (_JpaRepository_ implementation) would create one.
-Morover, I know everything is configured corretly since all other transactional methods in the project are working corretly.
-Is this transacion by any chance read-only? I check that quickly - and it appears it isn't.
+_@Transactional_ is from the Spring framework and repo is _spring-data-jpa_ - so even if there was not atcive transaction then _SimpleJpaRepository_ (_JpaRepository_ implementation) would create one.  
+Morover, I know everything is configured corretly since all other transactional methods in the project work well.  
+Is this transacion by any chance read-only? I check that quickly - and it appears it isn't.  
 But debugger shows that my transaction is not new (there is external transaction around it) - and this is my lead.
 
 &nbsp;
 
 So the expected flow in this case go as follows:
+
 1. _createSummary()_ method is called
 2. method needs transaction (_@Transactional_), so one is created 
 3. external transaction is present, so createSummary transaction (let's call it internal transaction) joins it, as propagation was not specified and default one is _Propagation.REQUIRED_
@@ -41,8 +42,8 @@ This is clearly not what is happening in our case, but to undersand it we need t
 
 #### Context
 
-1. The whole case is about some file processing. There is a FileProcessor with _@Transactional_ _processFile()_ method, which publishes application event when processing is done.
-
+ 1. The whole case is about some file processing. There is a _FileProcessor_ with _@Transactional_ _processFile()_ method, which publishes application event when processing is done.
+ 
 ```java
 /* FileProcessor */
 
@@ -53,13 +54,15 @@ This is clearly not what is happening in our case, but to undersand it we need t
     }
 ```  
 
-2. _EventPublisher_ uses _spring_ _ApplicationEventPublisher_ but does a little more. Someone figured out that it will check if a transaction is present and
+&nbsp;
+
+ 2. _EventPublisher_ uses _spring_ _ApplicationEventPublisher_ but does a little more. Someone figured out that it will check if a transaction is present and
 	- if it is - it will publish after commit
 	- if not - it will publish immediately
 
 	I can think about two reasons for such a solution:
-		- to make the transaction as quick as possible
-		- to make sure all the data are already in db, since event may be handled outside the scope of current transaction
+	- to make the transaction as quick as possible
+	- to make sure all the data are already in db, since event may be handled outside the scope of current transaction
 		
 	this is how it looks in the code:
 	
@@ -87,6 +90,8 @@ This is clearly not what is happening in our case, but to undersand it we need t
         applicationEventPublisher.publishEvent(e);
     }
 ```  
+
+&nbsp;
 	
 3. _FileProcessedEvent_ is handled by _SummaryMaker.createSummary(FileProcessedEvent event)_ - the method we've already seen.
 
