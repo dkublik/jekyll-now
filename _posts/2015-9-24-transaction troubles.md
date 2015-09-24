@@ -21,18 +21,18 @@ Recently I've faced an interesting issue. Got transactional method saving entity
 ```  
 
 _@Transactional_ is from the Spring framework and repo is _spring-data-jpa_ - so even if there was not atcive transaction then _SimpleJpaRepository_ (_JpaRepository_ implementation) would create one.  
-Morover, I know everything is configured corretly since all other transactional methods in the project work well.  
+Morover, I know everything is configured corretly since all the other transactional methods in the project work well.  
 Is this transacion by any chance read-only? I check that quickly - and it appears it isn't.  
-But debugger shows that my transaction is not new (there is external transaction around it) - and this is my lead.
+But debugger shows that my transaction is not new (there is an external transaction around it) - and this is my lead.
 
 &nbsp;
 
-So the expected flow in this case go as follows:
+So the expected flow in this case goes as follows:
 
 1. _createSummary()_ method is called
 2. method needs transaction (_@Transactional_), so one is created 
 3. external transaction is present, so createSummary transaction (let's call it internal transaction) joins it, as propagation was not specified and default one is _Propagation.REQUIRED_
-4. Only one commit is expected - the one from external transaction.
+4. Only one commit is expected - the one from the external transaction.
 
 ![expected transaction flow]({{ site.baseurl }}/images//2015-09-2-transactions-trouble/trans1.png "expected transaction flow")
 
@@ -156,6 +156,8 @@ and to achieve it we only need to change propagation to *REQUIRES_NEW* in _Summa
 ![corrected transaction flow]({{ site.baseurl }}/images//2015-09-2-transactions-trouble/trans3.png "corrected transaction flow")
 
 &nbsp;
+
+You can check the demo code ["here"](https://github.com/dkublik/transaction-troubles)
 
 &nbsp;
 ****
