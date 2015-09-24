@@ -59,14 +59,16 @@ This is clearly not what is happening in our case, but to undersand it we need t
 &nbsp;
 
 2) _EventPublisher_ uses _spring_ _ApplicationEventPublisher_ but does a little more. Someone figured out that it will check if a transaction is present and
-  - if it is - it will publish after commit
-  - if not - it will publish immediately  
+
++ if it is - it will publish after commit
++ if not - it will publish immediately  
 
 I can think about two reasons for such a solution:
-  - to make the transaction as quick as possible
-  - to make sure all the data are already in db, since event may be handled outside the scope of current transaction
+
++ to make the transaction as quick as possible
++ to make sure all the data are already in db, since event may be handled outside the scope of current transaction
 		
-	this is how it looks in the code:
+this is how it looks in the code:
 	
 ```java
 /* EventPublisher */
@@ -114,10 +116,11 @@ The error assumption is that transaction ends immediately after a commit, when i
 To be notified about commit we registered _TransactionSynchronization_.
 If we examine _org.springframework.transaction.support.AbstractPlatformTransactionMan.processCommit(DefaultTransactionStatus status)_
 we will see the following steps:
-  - before commit actions
-  - actual commit
-  - after commit actions - where our registered synchronization is called and event is fired.
-  - cleanup - where transaction is finished (removed from thread local and stops being active)
+
++ before commit actions
++ actual commit
++ after commit actions - where our registered synchronization is called and event is fired.
++ cleanup - where transaction is finished (removed from thread local and stops being active)
 
 so what we achived with our code was:
 
@@ -130,10 +133,12 @@ so what we achived with our code was:
 3. internal transaction does not commit cause the external transaction is active
 4. external transaction is finished
 
+&nbsp;
+
 #### Solution
 
 Understanding what happened, we now can see that the solution is simple - we shouldn't join the existing transaction,
-and to achieve it we only need to change propagation to REQUIRES_NEW in _SummaryMaker_
+and to achieve it we only need to change propagation to _REQUIRES_NEW_ in _SummaryMaker_
 
 ```java
 /* SummaryMaker */
