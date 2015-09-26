@@ -4,7 +4,7 @@ title: Transaction Troubles
 comments: true
 ---
 
-Recently I've faced an interesting issue. Got transactional method saving entity to the database - method is called, no exception is thrown - but no data is stored to the db.
+Recently I've faced an interesting issue. Got transactional method saving entity to the database - method is called, no exception is thrown - but no data is stored into the db.
 
 &nbsp;
 
@@ -20,9 +20,9 @@ Recently I've faced an interesting issue. Got transactional method saving entity
     }
 ```  
 
-_@Transactional_ is from the Spring framework and repo is _spring-data-jpa_ - so even if there was not atcive transaction then _SimpleJpaRepository_ (_JpaRepository_ implementation) would create one.  
-Morover, I know everything is configured corretly since all the other transactional methods in the project work well.  
-Is this transacion by any chance read-only? I check that quickly - and it appears it isn't.  
+_@Transactional_ is from the Spring framework and repo is _spring-data-jpa_ - so even if there was not active transaction then _SimpleJpaRepository_ (_JpaRepository_ implementation) would create one.  
+Moreover, I know everything is configured correctly since all the other transactional methods in the project work well.  
+Is this transaction by any chance read-only? I check that quickly - and it appears it isn't.  
 But debugger shows that my transaction is not new (there is an external transaction around it) - and this is my lead.
 
 &nbsp;
@@ -38,7 +38,7 @@ So the expected flow in this case goes as follows:
 
 &nbsp;
 
-This is clearly not what is happening in our case, but to undersand it we need to find out how and when _createSummary()_ method is called.
+This is clearly not what is happening in our case, but to understand it we need to find out how and when _createSummary()_ method is called.
 
 &nbsp;
 
@@ -67,6 +67,7 @@ I can think about two reasons for such a solution:
 
 + to make the transaction as quick as possible
 + to make sure all the data are already in db, since event may be handled outside the scope of current transaction
++ to make sure that we trigger event only when everything went ok (data is in db, no rollback occurred)
 		
 this is how it looks in the code:
 	
@@ -115,7 +116,7 @@ And of course again - this is not what is happening.
 The error assumption is that transaction ends immediately after a commit, when in fact, it isn't.
 
 To be notified about commit we registered _TransactionSynchronization_.
-If we examine _org.springframework.transaction.support.AbstractPlatformTransactionMan.processCommit(DefaultTransactionStatus status)_
+If we examine _org.springframework.transaction.support.AbstractPlatformTransactionManager.processCommit(DefaultTransactionStatus status)_
 we will see the following steps:
 
 + before commit actions
@@ -123,7 +124,7 @@ we will see the following steps:
 + after commit actions - where our registered synchronization is called and event is fired.
 + cleanup - where transaction is finished (removed from thread local and stops being active)
 
-so what we achived with our code was:
+so what we achieved with our code was:
 
 ![actual transaction flow]({{ site.baseurl }}/images//2015-09-2-transactions-trouble/trans2.png "actual transaction flow")
 
