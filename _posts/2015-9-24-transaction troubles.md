@@ -63,7 +63,7 @@ This is clearly not what is happening in our case, but to understand it we need 
 + if it is - it will publish after commit
 + if not - it will publish immediately  
 
-I can think about two reasons for such a solution:
+I can think about three reasons for such a solution:
 
 + to make the transaction as quick as possible
 + to make sure all the data are already in db, since event may be handled outside the scope of current transaction
