@@ -18,11 +18,11 @@ The same goes for a database connection. Not that long ago minimum db-aware spri
 
 Along the way we dropped xml configs in favour of configurations. Now - everything you need to do is to add another dependency _'org.springframework.boot:spring-boot-starter-data-jpa'_ and some db driver (like _'com.h2database:h2'_) and again - spring creates everything behind the curtains.
 
-&nbsp;
+
 
 I don't know about you - but I grow suspicious when that many things happen without my knowledge. After having been using Spring Boot for a while I needed to look under the hood to to feel safe again - not that much under - just enough to get back to my comfort zone. 
 
-&nbsp;
+
 
 #### High Level View
 
@@ -89,11 +89,11 @@ If you check _spring-boot-autoconfigure.jar/META-INF/spring.factories_ you'll fi
 So let's figure out how the required components for db access are created.  
 To do so let's not use _'org.springframework.boot:spring-boot-starter-data-jpa'_ dependency in our showcase, but start with _'org.springframework.boot:spring-boot-starter'_ and see what dependencies should we add to create database aware app and how required steps are automagically performed.
 
-&nbsp;
+
 
 With only _'spring-boot-starter:1.2.6.RELEASE'_ dependency I got 22 beans registered by spring in my app(18 spring beans + 4 application specific beans). There is no _dataSource_ nor _transactionManager_ amongst them.
 
-&nbsp;
+
 
 I want to add hibernate entity to the project so I will include _'org.hibernate:hibernate-entitymanager'_ compile dependency.  
 Now _JtaAutoConfiguration_ with _jta properties_ beans were added as _javax.transaction.Transaction_ appeared on the classpath.  
@@ -108,11 +108,11 @@ and we are still missing it.
 It's easy to figure out that _dataSource_ will be created by _DataSourceAutoConfiguration_ (found on list in _spring.factories_).  
 It's seems that all conditions are met here, but _DataSourceAutoConfiguration_ class can't be classloaded yet - as it uses _org.apache.tomcat.jdbc.pool.DataSourceProxy_ so it depends on _'org.apache.tomcat:tomcat-jdbc'_ - let's add it to the class path as well.
 
-&nbsp;
+
 
 Running the app we can see that we're getting closer - as this time _'hibernate.dialect'_ can't be determined. No surprise here - it couldn't have been determined by spring as we hadn't added any db specific dependency. So let's include '_com.h2database:h2'_ .
 
-&nbsp;
+
 
 Everything seems to work now. 54 beans loaded by spring. Among them:
 
