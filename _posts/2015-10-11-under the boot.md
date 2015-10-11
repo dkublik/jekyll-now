@@ -4,16 +4,17 @@ title: Under The Boot
 comments: true
 ---
 
-Remember the times when we had to register dispatchers, viewResolvers, etc. to make our spring application web-app? Then there was _@EnableWebMvc_ annotation and now even this is redundant. These days the only thing you need to do is to add _'org.springframework.boot:spring-boot-starter-web'_ dependency to your project and everything else is done automagically.
+Remember the times when we had to register dispatchers, viewResolvers, etc. to make our spring application web-app? Then there was _@EnableWebMvc_ annotation and now even this is redundant.  
+These days the only thing you need to do is to add _'org.springframework.boot:spring-boot-starter-web'_ dependency to your project and everything else is done automagically.
 
 &nbsp;
 
 The same goes for a database connection. Not that long ago minimum db-aware spring-context configuration was:
 
-+ register data source (_<jdbc:embedded-database id="dataSource" type="HSQL"/>_)
-+ register entity manager (through entity manager factory) (_<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">_)
-+ register transaction manager (_<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager" >_)
-+ turn on annotation driven transaction boundaries (_<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="false"/>_)
++ register data source (_&lt;jdbc:embedded-database id="dataSource" type="HSQL"/&gt;_)
++ register entity manager (through entity manager factory) (_&lt;bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"&gt;_)
++ register transaction manager (_&lt;bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager" &gt;_)
++ turn on annotation driven transaction boundaries (_&lt;tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="false"/&gt;_)
 
 &nbsp;
 
@@ -22,6 +23,8 @@ Along the way we dropped xml configs in favour of configurations. Now - everythi
 &nbsp;
 
 I don't know about you - but I grow suspicious when that many things happen without my knowledge. After having been using Spring Boot for a while I needed to look under the hood to to feel safe again - not that much under - just enough to get back to my comfort zone. 
+
+&nbsp;
 
 #### High Level View
 
@@ -47,7 +50,6 @@ So for example - to check if _defaultViewResolver()_ should be created - _@Condi
 @ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
 (...)
 public class WebMvcAutoConfiguration {
-	
 	(...)
 
 	@Bean
@@ -60,9 +62,10 @@ public class WebMvcAutoConfiguration {
 	}
 	
 	(...)
-
 }
 ```  
+
+&nbsp;
 
 #### Where Is It Triggered?
 
@@ -76,35 +79,36 @@ public class Application {
         SpringApplication application = new SpringApplication(Application.class);
         application.run(args);
     }
-
 }
 ```  
 
 If you check _spring-boot-autoconfigure.jar/META-INF/spring.factories_ you'll find out _org.springframework.boot.autoconfigure.EnableAutoConfiguration_ property which specifies which auto configurations will be used to 'guess' and create beans you require.
 
-`+--- spring-boot-autoconfigure.jar
-|    +--- META-INF
-|    |    \--- spring.factories
-|    +--- org.springframework.boot.autoconfigure
-(...)
-|    |    +--- jdbc
-|    |    |	   \--- DataSourceAutoConfiguration
-(...)
-|    |    +--- web
-|    |    |	   +--- DispatcherServletAutoConfiguration
-|    |    |	   +--- EmbeddedServletContainerAutoConfiguration
-|    |    |	   \--- WebMvcAutoConfiguration
-(...)
-|    |    +--- orm.jpa
-|    |    |	   +--- HibernateJpaAutoConfiguration
-|    |    |	   \--- JpaBaseConfiguration
-|    |    \--- EnableAutoConfiguration
+`+--- spring-boot-autoconfigure.jar  
+|    +--- META-INF  
+|    |    \--- spring.factories  
+|    +--- org.springframework.boot.autoconfigure  
+(...)  
+|    |    +--- jdbc  
+|    |    |	   \--- DataSourceAutoConfiguration  
+(...)  
+|    |    +--- web  
+|    |    |	   +--- DispatcherServletAutoConfiguration  
+|    |    |	   +--- EmbeddedServletContainerAutoConfiguration  
+|    |    |	   \--- WebMvcAutoConfiguration  
+(...)  
+|    |    +--- orm.jpa  
+|    |    |	   +--- HibernateJpaAutoConfiguration  
+|    |    |	   \--- JpaBaseConfiguration  
+|    |    \--- EnableAutoConfiguration  
 (...)`
+
+&nbsp;
 
 #### DB Magic Example
 
 So let's figure out how the required components for db access are created.  
-To do so let's not use _'org.springframework.boot:spring-boot-starter-data-jpa'_ dependency in our showcase, but start start with _'org.springframework.boot:spring-boot-starter'_ and see what dependencies should we add to create database aware app and how required steps are automagically performed.
+To do so let's not use _'org.springframework.boot:spring-boot-starter-data-jpa'_ dependency in our showcase, but start with _'org.springframework.boot:spring-boot-starter'_ and see what dependencies should we add to create database aware app and how required steps are automagically performed.
 
 &nbsp;
 
@@ -116,8 +120,8 @@ I want to add hibernate entity to the project so I will include _'org.hibernate:
 Now _JtaAutoConfiguration_ with _jta properties_ beans were added as _javax.transaction.Transaction_ appeared on the classpath.  
 I was little hoping for _HibernateJpaAutoConfiguration_ to catch on - but this one also requires
 
-+ LocalContainerEntityManagerFactoryBean (to provide EntityManager)
-+ EnableTransactionManagement (to provide TransactionManager)
++ _LocalContainerEntityManagerFactoryBean_ (to provide _entityManager_)
++ _EnableTransactionManagement_ (to provide _transactionManager_)
 
 Both can be found in _'org.springframework:spring-orm'_ - so let's add this dependency to the classpath.  
 Now spring will try to load _HibernateJpaAutoConfiguration_, but this one requires _dataSource_ bean (_@Autowired_ as a private field),
