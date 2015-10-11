@@ -84,7 +84,7 @@ public class Application {
 
 If you check _spring-boot-autoconfigure.jar/META-INF/spring.factories_ you'll find out _org.springframework.boot.autoconfigure.EnableAutoConfiguration_ property which specifies which auto configurations will be used to 'guess' and create beans you require.
 
-`+--- spring-boot-autoconfigure.jar  
++--- spring-boot-autoconfigure.jar  
 |    +--- META-INF  
 |    |    \--- spring.factories  
 |    +--- org.springframework.boot.autoconfigure  
@@ -101,7 +101,7 @@ If you check _spring-boot-autoconfigure.jar/META-INF/spring.factories_ you'll fi
 |    |    |	   +--- HibernateJpaAutoConfiguration  
 |    |    |	   \--- JpaBaseConfiguration  
 |    |    \--- EnableAutoConfiguration  
-(...)`
+(...)
 
 &nbsp;
 
