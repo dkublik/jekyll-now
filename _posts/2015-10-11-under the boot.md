@@ -7,7 +7,7 @@ comments: true
 Remember the times when we had to register dispatchers, viewResolvers, etc. to make our spring application web-app? Then there was _@EnableWebMvc_ annotation and now even this is redundant.  
 These days the only thing you need to do is to add _'org.springframework.boot:spring-boot-starter-web'_ dependency to your project and everything else is done automagically.
 
-&nbsp;
+
 
 The same goes for a database connection. Not that long ago minimum db-aware spring-context configuration was:
 
@@ -15,8 +15,6 @@ The same goes for a database connection. Not that long ago minimum db-aware spri
 + register entity manager (through entity manager factory) (_&lt;bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"&gt;_)
 + register transaction manager (_&lt;bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager" &gt;_)
 + turn on annotation driven transaction boundaries (_&lt;tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="false"/&gt;_)
-
-&nbsp;
 
 Along the way we dropped xml configs in favour of configurations. Now - everything you need to do is to add another dependency _'org.springframework.boot:spring-boot-starter-data-jpa'_ and some db driver (like _'com.h2database:h2'_) and again - spring creates everything behind the curtains.
 
@@ -34,8 +32,6 @@ But those are loaded only if specific conditions are met - namely:
 
 + required class is available on the classpath (new beans magically created when dependency added)
 + required bean was not created explicitly by a programmer
-
-&nbsp;
 
 So for example - to load _WebMvcAutoConfiguration_ when _Servlet_, _DispatcherServlet_, _WebMvcConfigurerAdapter_ classes are on the classpath _@ConditionalOnClass({ Servlet.class, DispatcherServlet.class, WebMvcConfigurerAdapter.class })_ is used.  
 This configuration loads all web mvc defaults - but most of them again - only if specific bean doesn't yet exist.  
