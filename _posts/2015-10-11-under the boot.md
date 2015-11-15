@@ -128,7 +128,7 @@ Dependencies are summarized on diagram below.
 
 &nbsp;
 
-Showcase project cant be found ["here"](https://github.com/dkublik/under-the-boot).
+Showcase project can be found ["here"](https://github.com/dkublik/under-the-boot).
 
 &nbsp;
 ****
