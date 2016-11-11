@@ -31,9 +31,7 @@ class Unit {
     private Long id;
 }
 
-
-@Repository
-interface WorkerRepository extends JpaRepository<Worker, String> {
+interface WorkerRepository extends CrudRepository<Worker, String> {
 } 
 ```  
 
@@ -56,8 +54,7 @@ Imagine you need to query by surname - _findBySurname()_
 
 
 ```java
-@Repository
-interface WorkerRepository extends JpaRepository<Worker, String> {
+interface WorkerRepository extends CrudRepository<Worker, String> {
     Worker findBySurname(String surname);
 }
 ```  
@@ -90,8 +87,7 @@ The same will be true for JPQL:
 
 
 ```java
-@Repository
-interface WorkerRepository extends JpaRepository<Worker, String> {
+interface WorkerRepository extends CrudRepository<Worker, String> {
     @Query("select w from Worker w where w.surname = :surname")
     Worker findBySurnameJPQL(@Param("surname") String surname);
 }
@@ -103,8 +99,7 @@ Since _Unit_ has eager mapping - to avoid additional select you will always need
 + By JPQL
 
 ```java
-@Repository
-interface WorkerRepository extends JpaRepository<Worker, String> {
+interface WorkerRepository extends CrudRepository<Worker, String> {
     @Query("select w from EagerWorker w join fetch w.unit u where w.surname = :surname")
     Worker findBySurnameJPQLFetchingUnit(@Param("surname") String surname);
 }
@@ -113,8 +108,7 @@ interface WorkerRepository extends JpaRepository<Worker, String> {
 + or by EntityGraph
 
 ```java
-@Repository
-interface WorkerRepository extends JpaRepository<Worker, String> {
+interface WorkerRepository extends CrudRepository<Worker, String> {
 	@EntityGraph(attributePaths = "unit")
     Worker findBySurname(String surname);
 }
@@ -134,7 +128,7 @@ you will need to add it to every existing query method to avoid additional join.
 It doesn't end with one repository. Imagine _Unit_ having eager relation on it's own. Now you would need to add another fetch:
 
 ```java
-interface EagerWorkerRepository extends JpaRepository<EagerWorker, String> {
+interface EagerWorkerRepository extends CrudRepository<EagerWorker, String> {
     @Query("select w from Worker w join fetch w.unit u join fetch u.owner where w.surname = :surname")
     Worker findBySurname(@Param("surname") String surname);
 }
