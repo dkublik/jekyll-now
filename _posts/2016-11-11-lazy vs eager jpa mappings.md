@@ -37,7 +37,6 @@ interface WorkerRepository extends JpaRepository<Worker, String> {
 ```  
 
 &nbsp;
-
 By calling _workerRepository.findOne(personalId)_ I will produce
 
 
@@ -46,7 +45,7 @@ select worker0_.personal_id as personal1_1_0_, worker0_.surname as surname2_1_0_
 ```  
 
 
-This is perfect. I got only one query (join on worker and unit tables) and I can access all Unit information for free - without a need for additional query.
+This is perfect. I got only one query (join on worker and unit tables) and I can access all _Unit_ information for free - without a need for additional query.
 It's true - but only when querying by id.
 
 
@@ -83,9 +82,8 @@ def "should create two queries when calling by findBySurname"() {
 		queryStatistics.nrOfQueries() == 2
 }
 ```  
-["source"](https://github.com/dkublik/sd-fetching/blob/master/src/test/groovy/pl/dk/sdfetching/eager/EagerWorkerRepositorySpec.groovy)
+[source](https://github.com/dkublik/sd-fetching/blob/master/src/test/groovy/pl/dk/sdfetching/eager/EagerWorkerRepositorySpec.groovy)
 
-&nbsp;
 It happens cause with the _findBySurname_ you are asking only for the _Worker_ entity. Then - when the object is countructed - framework finds out that _Worker.unit_ property has an eager mapping - so need to be set, but since _Unit_ data is not present - one more query need to be performed.
 
 The same will be true for JPQL:
@@ -112,7 +110,6 @@ interface WorkerRepository extends JpaRepository<Worker, String> {
 }
 ```  
 
-&nbsp;
 + or by EntityGraph
 
 ```java
@@ -143,7 +140,6 @@ interface WorkerRepository extends JpaRepository<Worker, String> {
 }
 ```  
 
-&nbsp;
 Somebody adding eager relation somewhere can cause perfomance issues in other repositories.
 
 
@@ -159,7 +155,7 @@ Moreover adding new Lazy relation shouldn't affect exisiting code.
 To sum it up: I'm not saying that everything should be loaded lazy. The conclusion is: all entity mappings should be lazy and eager loading performed by explicit fetching.
 
 
-&nbsp;
-Examples can be found: ["here"](https://github.com/dkublik/sd-fetching).
+
+Examples can be found: [here](https://github.com/dkublik/sd-fetching).
 
 &nbsp;
