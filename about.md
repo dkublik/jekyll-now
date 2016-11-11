@@ -5,7 +5,7 @@ permalink: /about/
 ---
 
 Dawid Kublik  
-Senior Java Developer @ 4FinanceIT  
+Senior Java Developer @ ViacomTech  
 more - ToBeDescribed  
 
 ### More Information
