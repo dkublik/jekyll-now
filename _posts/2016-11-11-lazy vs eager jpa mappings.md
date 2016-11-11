@@ -3,7 +3,8 @@ layout: post
 title: Should I go Eager or Lazy with JPA mappings?
 comments: true
 ---
-The short answer is: go Lazy if you care about number of queries happening under the hood. "But what if I always need a particular relation?" - still go lazy, here is why.
+The short answer is: go Lazy if you care about number of queries happening under the hood. _"But what if I always need a particular relation?"_ - still go lazy, here is why.
+
 
 #### There is No Such Thing As Free Lunch
 
@@ -36,7 +37,6 @@ interface WorkerRepository extends JpaRepository<Worker, String> {
 } 
 ```  
 
-&nbsp;
 By calling _workerRepository.findOne(personalId)_ I will produce
 
 
@@ -47,6 +47,7 @@ select worker0_.personal_id as personal1_1_0_, worker0_.surname as surname2_1_0_
 
 This is perfect. I got only one query (join on worker and unit tables) and I can access all _Unit_ information for free - without a need for additional query.
 It's true - but only when querying by id.
+
 
 
 #### The Problem with Eager Mapping
@@ -61,7 +62,6 @@ interface WorkerRepository extends JpaRepository<Worker, String> {
 }
 ```  
 
-&nbsp;
 Now suddenly you we'got 2 queries:
 
 
@@ -115,7 +115,7 @@ interface WorkerRepository extends JpaRepository<Worker, String> {
 ```java
 @Repository
 interface WorkerRepository extends JpaRepository<Worker, String> {
-    @EntityGraph(attributePaths = "unit")
+	@EntityGraph(attributePaths = "unit")
     Worker findBySurname(String surname);
 }
 ```  
@@ -134,21 +134,24 @@ you will need to add it to every existing query method to avoid additional join.
 It doesn't end with one repository. Imagine _Unit_ having eager relation on it's own. Now you would need go
 
 ```java
-interface WorkerRepository extends JpaRepository<Worker, String> {
-	@Query("select w from Worker w join fetch w.unit u join fetch u.owner where w.surname = :surname")
-    Worker findBySurname(String surname);
+interface EagerWorkerRepository extends JpaRepository<EagerWorker, String> {
+    @Query("select w from Worker w join fetch w.unit u join fetch u.owner where w.surname = :surname")
+    Worker findBySurname(@Param("surname") String surname);
 }
 ```  
 
 Somebody adding eager relation somewhere can cause perfomance issues in other repositories.
 
 
-Of course you can use entity graphs. These can be reused - when being created in entity classes. But then you need to remember to add them over repository methods and they also polute entity classes. Also, they would need to repeat data in case when having eager relation in eager relation. (EntityGraph for _Unit_ need to have information to eagerly fetch _Owner_, and entity Graph for _Worker_ needs to have information to eagerly fetch _Unit_ and again _Owner_).
+Of course you can use entity graphs. These can be reused - when being created in entity classes. But then you need to remember to add references over repository methods and they also polute entity classes. Morover - they would need to repeat data in case when having eager relation in eager relation. (EntityGraph for _Unit_ need to have information to eagerly fetch _Owner_, and entity Graph for _Worker_ needs to have information to eagerly fetch _Unit_ and again _Owner_).
 
 Better solution would be to set all you relations as LAZY.
 
-Model is lazy, but you can still have eager queries - by JPQL. You still need to manually fetch your needed relations (not doing so will create as before additional query when in transaction or LazyIntializationException when not).
-But - When you don't need to access relation data - you are not forced to do fetching and no extra query is performed.
+
+#### Conclusion
+
+Model is lazy, but you can still have eager queries - by JPQL. You still need to manually fetch your needed relations (not doing so will create as before additional query when in transaction or _LazyIntializationException_ when not).
+But - when you don't need to access relation data - you are not forced to do fetching and no extra query is performed.
 Moreover adding new Lazy relation shouldn't affect exisiting code.
 
 
