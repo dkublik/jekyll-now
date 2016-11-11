@@ -84,7 +84,7 @@ def "should create two queries when calling by findBySurname"() {
 ```  
 [source](https://github.com/dkublik/sd-fetching/blob/master/src/test/groovy/pl/dk/sdfetching/eager/EagerWorkerRepositorySpec.groovy)
 
-It happens cause with the _findBySurname_ you are asking only for the _Worker_ entity. Then - when the object is countructed - framework finds out that _Worker.unit_ property has an eager mapping - so need to be set, but since _Unit_ data is not present - one more query need to be performed.
+It happens cause with the _findBySurname_ you are asking only for the _Worker_ entity. Then - when the object is constructed - framework finds out that _Worker.unit_ property has an eager mapping - so need to be set, but since _Unit_ data is not present - one more query need to be performed.
 
 The same will be true for JPQL:
 
@@ -131,7 +131,7 @@ For every query method in your repo - you will always need to manually fetch all
 
 Imagine having repo with 10 query methods - all fetching all eager relations. Now you need to modify your entity - if you add new eager relation,
 you will need to add it to every existing query method to avoid additional join.
-It doesn't end with one repository. Imagine _Unit_ having eager relation on it's own. Now you would need go
+It doesn't end with one repository. Imagine _Unit_ having eager relation on it's own. Now you would need to add another fetch:
 
 ```java
 interface EagerWorkerRepository extends JpaRepository<EagerWorker, String> {
@@ -143,7 +143,7 @@ interface EagerWorkerRepository extends JpaRepository<EagerWorker, String> {
 Somebody adding eager relation somewhere can cause perfomance issues in other repositories.
 
 
-Of course you can use entity graphs. These can be reused - when being created in entity classes. But then you need to remember to add references over repository methods and they also polute entity classes. Morover - they would need to repeat data in case when having eager relation in eager relation. (EntityGraph for _Unit_ need to have information to eagerly fetch _Owner_, and entity Graph for _Worker_ needs to have information to eagerly fetch _Unit_ and again _Owner_).
+Of course you can use entity graphs. These can be reused - when being created in entity classes. But then you need to remember to add references over repository methods and they also polute entity classes. Moreover - they would need to repeat data in case when having eager relation in eager relation. (EntityGraph for _Unit_ need to have information to eagerly fetch _Owner_, and entity Graph for _Worker_ needs to have information to eagerly fetch _Unit_ and again _Owner_).
 
 Better solution would be to set all you relations as LAZY.
 
