@@ -6,7 +6,7 @@ comments: true
 The short answer is: go Lazy if you care about number of queries happening under the hood. _"But what if I always need a particular relation?"_ - still go lazy, here is why.
 
 
-#### There is No Such Thing As Free Lunch
+#### There is No Such Thing As a Free Lunch
 
 I used to think: _"In many scenarios eager is for free. If in most queries you need a particular relation then it's better to fetch it eagerly in one join, and in those rare cases when don't need it - one additional join costs almost nothing"_.
 
@@ -81,7 +81,7 @@ def "should create two queries when calling by findBySurname"() {
 ```  
 [source](https://github.com/dkublik/sd-fetching/blob/master/src/test/groovy/pl/dk/sdfetching/eager/EagerWorkerRepositorySpec.groovy)
 
-It happens cause with the _findBySurname_ you are asking only for the _Worker_ entity. Then - when the object is constructed - framework finds out that _Worker.unit_ property has an eager mapping - so need to be set, but since _Unit_ data is not present - one more query need to be performed.
+It happens cause with the _findBySurname()_ you are asking only for the _Worker_ entity. Then - when the object is constructed - framework finds out that _Worker.unit_ property has an eager mapping - so need to be set, but since _Unit_ data is not present - one more query need to be performed.
 
 The same will be true for JPQL:
 
@@ -109,7 +109,7 @@ interface WorkerRepository extends CrudRepository<Worker, String> {
 
 ```java
 interface WorkerRepository extends CrudRepository<Worker, String> {
-	@EntityGraph(attributePaths = "unit")
+    @EntityGraph(attributePaths = "unit")
     Worker findBySurname(String surname);
 }
 ```  
