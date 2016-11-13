@@ -5,7 +5,7 @@ permalink: /about/
 ---
 
 Dawid Kublik  
-Senior Java Developer @ ViacomTech  
+Lead Software Engineer @ ViacomTech  
 more - ToBeDescribed  
 
 ### More Information
