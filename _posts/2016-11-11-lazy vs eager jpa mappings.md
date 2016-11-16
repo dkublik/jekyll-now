@@ -139,7 +139,7 @@ Somebody adding eager relation somewhere can cause perfomance issues in other re
 
 Of course you can use entity graphs. These can be reused - when being created in entity classes. But then you need to remember to add references over repository methods and they also polute entity classes. Moreover - they would need to repeat data in case when having eager relation in eager relation. (EntityGraph for _Unit_ need to have information to eagerly fetch _Owner_, and entity Graph for _Worker_ needs to have information to eagerly fetch _Unit_ and again _Owner_).
 
-Better solution would be to set all you relations as LAZY.
+Better solution would be to set all your relations as LAZY.
 
 
 #### Conclusion
