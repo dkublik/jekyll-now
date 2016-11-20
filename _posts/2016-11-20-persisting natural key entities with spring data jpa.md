@@ -4,15 +4,16 @@ title: Persisting Natural Key Entities with Spring Data JPA
 comments: true
 ---
 From the dawn of time there is an ongoing discussion about using [surrogate keys](https://en.wikipedia.org/wiki/Surrogate_key) vs [natural keys](https://en.wikipedia.org/wiki/Natural_key). 
-I don't want to take any side here just write about one consequence you'll face when persisting natural key entity with spring data repository.
+I don't want to take any side - here just write about one consequence you'll face when persisting natural key entity with Spring Data repository.
 
 
-From the perspective of this article the difference between natural key and surrogate key is that natural key is assigned by application (e.g. personalId for _Worker_, which can't be assigned by any generator strategy) whereas surrogate key in many cases is assigned by database (e.g. by sequence or identity table). Of course surrogate key can be assigned by application as well (like application generated uuid) - these cases will also face problems that are mentioned below for natural key entities.
+From the perspective of this article the difference between natural key and surrogate key is that natural key is assigned by application (e.g. personalId for _Worker_, which can't be assigned by any generator strategy), whereas surrogate key in many cases is assigned by a database (e.g. by sequence or identity table). Of course surrogate key can be assigned by an application as well (like application generated uuid) - these cases will also face problems that are mentioned below for natural key entities.
+
 
 
 #### The Difference in Number of Queries
 
-If we create _Worker_ with surrogate key assigned by database _(id)_
+If we create _Worker_ with surrogate key assigned by a database _(id)_
 
 
 ```java
@@ -45,8 +46,10 @@ we we'll end up with one generated query, which is exactly what was expected.
 insert into natural_key_worker (personal_id) values (?)
 ``` 
 
+
 We might however decide that _Worker.id_ property is not needed and treat _personalId_ as application assigned natural key.
 
+```java
 @Entity
 class NaturalKeyWorker {
     @Id
@@ -56,15 +59,17 @@ class NaturalKeyWorker {
         this.personalId = personalId;
     }
 }
+``` 
 
 Then - if we repeat our test - we'll observe that instead of one query we got two:
+
 ```sql
 select naturalkey0_.personal_id as personal1_0_0_ from natural_key_worker naturalkey0_ where naturalkey0_.personal_id=?
 insert into natural_key_worker (personal_id) values (?)
 ```
 
 
-It's quate easy to find out that_org.springframework.data.jpa.repository.support.SimpleJpaRepository.save()_ method decides whether to persist or merge entity by checking if this entity is new or not.
+It's quate easy to find out that _org.springframework.data.jpa.repository.support.SimpleJpaRepository.save()_ method decides whether to persist or merge entity by checking if this entity is new or not.
 
 
 ```java
@@ -83,9 +88,10 @@ public <S extends T> S save(S entity) {
 However _entityInformation.isNew(entity)_ is as simple as assuming that entity is not new when it has not null id. This will be true for ids assigned by db but not for these assigned by app. My _Worker_ got his id assigned on creation - long before he was persisted.
 
 
+
 #### Delivering isNew info
 
-Of course with the framework like Spring there is a way to handle it. In [documentation](http://docs.spring.io/spring-data/jpa/docs/1.10.5.RELEASE/reference/html/#jpa.entity-persistence.saving-entites) we can read that:
+Of course with a framework like Spring there is a way to handle it. In [documentation](http://docs.spring.io/spring-data/jpa/docs/1.10.5.RELEASE/reference/html/#jpa.entity-persistence.saving-entites) we can read about options for detection whether an entity is new or not:
 
 
 ![isNew() detection]({{ site.baseurl }}/images/2016-11-20-natural-key-persist/isNewDetection.png "isNew() detection")
@@ -107,7 +113,7 @@ class PersistableWorker implements Persistable {
     @Setter
     private String surname;
 
-	@Transient
+    @Transient
     private boolean isNew = false;
 
     PersistableWorker(String personalId, boolean isNew) {
@@ -131,6 +137,7 @@ class PersistableWorker implements Persistable {
 If I rerun my test now I will got only one query persisting my object.
 
 
+
 #### Controlling the Flow
 
 So why is _isNew()_ checked in _save()_ method in the first place? Well - if the object is not new then you don't want to insert but update it, like in the example below
@@ -138,7 +145,7 @@ So why is _isNew()_ checked in _save()_ method in the first place? Well - if the
 ```java
 def "should save with two queries for existing object"() {
 	given:
-		PersistableWorker worker = new PersistableWorker(PERSONAL_ID, true);
+		PersistableWorker worker = new PersistableWorker(PERSONAL_ID, true)
 		workerRepository.save(worker)
 		queryStatistics.clear()
 	when:
@@ -170,7 +177,7 @@ What I would do would be:
 ```java
 def "should save with one query for existing object"() {
 	given:
-		PersistableWorker worker = new PersistableWorker(PERSONAL_ID);
+		PersistableWorker worker = new PersistableWorker(PERSONAL_ID, true);
 		workerRepository.save(worker)
 	when:
 		doInTx {
@@ -187,7 +194,7 @@ def "should save with one query for existing object"() {
 
 I don't need to call _save()_ if I retrieved my _Worker_ in the same transaction that I'm changing it, because _dirty checking_ mechanism will do that for me. So I never use _save()_ for update operation - but only for an insert. If so - then instead to call _save()_ and have the framework deciding for me which operation to perform I would like be able call _persist()_ by myself.
 
-There is no persist()_ method in spring data _org.springframework.data.repository.CrudRepository_, but it's quite easy to add it.
+There is no _persist()_ method in Spring Data _org.springframework.data.repository.CrudRepository_, but it's quite easy to add it.
 What you need to do is instead of extending _CrudRepository_ with your repos, create your own base interface with a simple implementation.
 
 
@@ -220,7 +227,7 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
 and register it with _@EnableJpaRepositories(repositoryBaseClass = BaseRepositoryImpl.class)_
 
 
-Now extending _Persistable_ with worker is not needed, as _workerRepository.persist(worker)_ operation results only in one insert. All of that just makes me wonder - Why Spring Data JPA decided to hide entityManager.persist() method in the first place?
+Now, extending _Persistable_ with worker is not needed, as _workerRepository.persist(worker)_ operation results only in one insert. All of that just makes me wonder - Why Spring Data JPA decided to hide _entityManager.persist()_ method in the first place?
 
 
 Full Examples can be found: [here](https://github.com/dkublik/sd-natural-keys).
