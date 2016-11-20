@@ -3,13 +3,12 @@ layout: post
 title: Persisting Natural Key Entities with Spring Data JPA
 comments: true
 ---
-From the dawn of time there is an ongoing discussion about using [surrogate keys](https://en.wikipedia.org/wiki/Surrogate_key) vs [natural keys](https://en.wikipedia.org/wiki/Natural_key). 
-I don't want to take any side - here just write about one consequence you'll face when persisting natural key entity with Spring Data repository.
+From the dawn of time there is an ongoing discussion about using [surrogate keys](https://en.wikipedia.org/wiki/Surrogate_key) vs [natural keys](https://en.wikipedia.org/wiki/Natural_key) in your database tables. 
+I don't want to take any side here - just write about one consequence you'll face when persisting natural key entity with Spring Data repository.
 
 
 From the perspective of this article the difference between natural key and surrogate key is that natural key is assigned by application (e.g. personalId for _Worker_, which can't be assigned by any generator strategy), whereas surrogate key in many cases is assigned by a database (e.g. by sequence or identity table). Of course surrogate key can be assigned by an application as well (like application generated uuid) - these cases will also face problems that are mentioned below for natural key entities.
-
-
+&nbsp;
 
 #### The Difference in Number of Queries
 
@@ -40,7 +39,7 @@ def "should save with one query for new object"() {
 }
 ``` 
 
-we we'll end up with one generated query, which is exactly what was expected.
+we'll end up with one generated query, which is exactly what was expected.
 
 ```sql
 insert into natural_key_worker (personal_id) values (?)
@@ -85,9 +84,8 @@ public <S extends T> S save(S entity) {
 ```
 
 	
-However _entityInformation.isNew(entity)_ is as simple as assuming that entity is not new when it has not null id. This will be true for ids assigned by db but not for these assigned by app. My _Worker_ got his id assigned on creation - long before he was persisted.
-
-
+However _entityInformation.isNew(entity)_ is as simple as assuming that entity is not new when it has not null id. This will be true for ids assigned by db but not for these assigned by an app. My _Worker_ got his id assigned on creation - long before he was persisted.
+&nbsp;
 
 #### Delivering isNew info
 
@@ -100,7 +98,7 @@ Of course with a framework like Spring there is a way to handle it. In [document
 Since option 3 is discouraged (I don't think that natural key is that rare thing) let's try to go with 2nd.
 
 
-We'll need to implement _Persistable_ interface and somehow decide if an entity is new or not. Very naive implementation might look like the one below. Notice that
+We'll need to implement _Persistable_ interface and somehow decide if an entity is new or not. Very naive implementation might look like the one below - deciding by passing additional argument. Notice that
 when _Worker_ is obtained by repo, it is instiantiated by default, no args constructor, so isNew = false;
 
 
@@ -135,12 +133,11 @@ class PersistableWorker implements Persistable {
 
 
 If I rerun my test now I will got only one query persisting my object.
-
-
+&nbsp;
 
 #### Controlling the Flow
 
-So why is _isNew()_ checked in _save()_ method in the first place? Well - if the object is not new then you don't want to insert but update it, like in the example below
+So why is _isNew()_ checked in _save()_ method in the first place? Well - if the object is not new then you don't want to insert but update it, so you need to retrieve it it first like in the example below
 
 ```java
 def "should save with two queries for existing object"() {
@@ -167,7 +164,7 @@ The _When_ section shows scenario when
 
 1. Existing worker is created (e.g. by data taken from obtained dto)
 2. got his name changed
-3. and merged again to the database.
+3. and merged to the database.
 
 It works fine except this is a scenario I never face.
 
@@ -192,7 +189,7 @@ def "should save with one query for existing object"() {
 ```
 
 
-I don't need to call _save()_ if I retrieved my _Worker_ in the same transaction that I'm changing it, because _dirty checking_ mechanism will do that for me. So I never use _save()_ for update operation - but only for an insert. If so - then instead to call _save()_ and have the framework deciding for me which operation to perform I would like be able call _persist()_ by myself.
+I don't need to call _save()_ if I retrieved my _Worker_ in the same transaction that I'm changing it, because _dirty checking_ mechanism will do that for me. So I never use _save()_ for an update operation - but only for an insert. If so - then instead to call _save()_ and have the framework deciding for me which operation to perform I would like be able call _persist()_ by myself.
 
 There is no _persist()_ method in Spring Data _org.springframework.data.repository.CrudRepository_, but it's quite easy to add it.
 What you need to do is instead of extending _CrudRepository_ with your repos, create your own base interface with a simple implementation.
