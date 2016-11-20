@@ -167,7 +167,7 @@ The _When_ section shows scenario when
 
 1. Existing worker is created (e.g. by data taken from obtained dto)
 2. got his name changed
-3. and merged to the database.
+3. and merged to the database (select + insert)
 
 It works fine, except this is a scenario I never face.
 
@@ -192,7 +192,7 @@ def "should save with one query for existing object"() {
 ```
 
 
-I don't need to call _save()_ if I retrieved my _Worker_ in the same transaction that I'm changing it, because _dirty checking_ mechanism will do that for me. So I never use _save()_ for an update operation - but only for an insert. If so - then instead to call _save()_ and have the framework deciding for me which operation to perform I would like be able call _persist()_ by myself.
+I don't need to call _save()_ if I retrieved my _Worker_ in the same transaction that I'm changing it, because _dirty checking_ mechanism will do that for me. So I never use _save()_ for an update operation - but only for an insert. If so - then instead of calling _save()_ and having the framework decide for me which operation to perform I would like be able call _persist()_ by myself.
 
 There is no _persist()_ method in Spring Data _org.springframework.data.repository.CrudRepository_, but it's quite easy to add it.
 What you need to do is instead of extending _CrudRepository_ with your repos, create your own base interface with a simple implementation.
@@ -227,7 +227,7 @@ public class BaseRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRep
 and register it with _@EnableJpaRepositories(repositoryBaseClass = BaseRepositoryImpl.class)_
 
 
-Now, extending _Persistable_ with worker is not needed, as _workerRepository.persist(worker)_ operation results only in one insert. All of that just makes me wonder - Why Spring Data JPA decided to hide _entityManager.persist()_ method in the first place?
+Now, extending _Persistable_ with _Worker_ is not needed, as _workerRepository.persist(worker)_ operation results only in one insert. All of that just makes me wonder - Why Spring Data JPA decided to hide _entityManager.persist()_ method in the first place?
 
 
 Full Examples can be found: [here](https://github.com/dkublik/sd-natural-keys).
