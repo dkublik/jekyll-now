@@ -7,12 +7,13 @@ From the dawn of time there is an ongoing discussion about using [surrogate keys
 I don't want to take any side here - just write about one consequence you'll face when persisting natural key entity with Spring Data repository.
 
 
-From the perspective of this article the difference between natural key and surrogate key is that natural key is assigned by application (e.g. personalId for _Worker_, which can't be assigned by any generator strategy), whereas surrogate key in many cases is assigned by a database (e.g. by sequence or identity table). Of course surrogate key can be assigned by an application as well (like application generated uuid) - these cases will also face problems that are mentioned below for natural key entities.
+From the perspective of this article the difference between a natural key and a surrogate key is that a natural key is assigned by an application (e.g. a personalId for a _Worker_, which can't be assigned by any generator strategy), whereas a surrogate key in many cases is assigned by a database (e.g. by a sequence or an identity table). Of course a surrogate key can be assigned by an application as well (like an application generated uuid) - these cases will also face problems that are mentioned below for natural key entities.
+
 &nbsp;
 
 #### The Difference in Number of Queries
 
-If we create _Worker_ with surrogate key assigned by a database _(id)_
+If we create a _Worker_ with a surrogate key assigned by a database _(id)_
 
 
 ```java
@@ -46,7 +47,7 @@ insert into natural_key_worker (personal_id) values (?)
 ``` 
 
 
-We might however decide that _Worker.id_ property is not needed and treat _personalId_ as application assigned natural key.
+We might however decide that _Worker.id_ property is not needed and treat _personalId_ as an application assigned natural key.
 
 ```java
 @Entity
@@ -84,7 +85,8 @@ public <S extends T> S save(S entity) {
 ```
 
 	
-However _entityInformation.isNew(entity)_ is as simple as assuming that entity is not new when it has not null id. This will be true for ids assigned by db but not for these assigned by an app. My _Worker_ got his id assigned on creation - long before he was persisted.
+However _entityInformation.isNew(entity)_ is as simple as assuming that an entity is not new when it has not null id. This will be true for ids assigned by db but not for these assigned by an app. My _Worker_ got his id assigned on creation - long before he was persisted.
+
 &nbsp;
 
 #### Delivering isNew info
@@ -98,8 +100,8 @@ Of course with a framework like Spring there is a way to handle it. In [document
 Since option 3 is discouraged (I don't think that natural key is that rare thing) let's try to go with 2nd.
 
 
-We'll need to implement _Persistable_ interface and somehow decide if an entity is new or not. Very naive implementation might look like the one below - deciding by passing additional argument. Notice that
-when _Worker_ is obtained by repo, it is instiantiated by default, no args constructor, so isNew = false;
+We'll need to implement _Persistable_ interface and somehow decide if an entity is new or not. A very naive implementation might look like the one below - deciding by passing an additional argument. Notice that
+when _Worker_ is obtained by repo, it is instiantiated by a default, no args constructor, so isNew = false;
 
 
 ```java
@@ -133,11 +135,12 @@ class PersistableWorker implements Persistable {
 
 
 If I rerun my test now I will got only one query persisting my object.
+
 &nbsp;
 
 #### Controlling the Flow
 
-So why is _isNew()_ checked in _save()_ method in the first place? Well - if the object is not new then you don't want to insert but update it, so you need to retrieve it it first like in the example below
+So why is _isNew()_ checked in _save()_ method in the first place? Well - if the object is not new then you don't want to insert but update it, so you need to retrieve it first like in the example below
 
 ```java
 def "should save with two queries for existing object"() {
@@ -166,7 +169,7 @@ The _When_ section shows scenario when
 2. got his name changed
 3. and merged to the database.
 
-It works fine except this is a scenario I never face.
+It works fine, except this is a scenario I never face.
 
 What I would do would be:
 
