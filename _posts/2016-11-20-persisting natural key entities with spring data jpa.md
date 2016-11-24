@@ -31,19 +31,21 @@ and try to persist it
 
 ```java
 def "should save with one query for new object"() {
-	given:
-		NaturalKeyWorker worker = new NaturalKeyWorker(PERSONAL_ID);
-	when:
-		workerRepository.persist(worker)
-	then:
-		queryStatistics.nrOfQueries() == 1
+    given:
+        SurrogateKeyWorker worker = new SurrogateKeyWorker(PERSONAL_ID);
+
+    when:
+        workerRepository.save(worker)
+
+    then:
+        queryStatistics.nrOfQueries() == 1
 }
 ``` 
 
 we'll end up with one generated query, which is exactly what was expected.
 
 ```sql
-insert into natural_key_worker (personal_id) values (?)
+insert into surrogate_key_worker (id, personal_id) values (null, ?)
 ``` 
 
 
