@@ -20,7 +20,7 @@ Along the way we dropped xml configs in favour of configurations. Now - everythi
 
 
 
-I don't know about you - but I grow suspicious when that many things happen without my knowledge. After having been using Spring Boot for a while I needed to look under the hood to to feel safe again - not that much under - just enough to get back to my comfort zone. 
+I don't know about you - but I grow suspicious when that many things happen without my knowledge. After having been using Spring Boot for a while I needed to look under the hood to feel safe again - not that much under - just enough to get back to my comfort zone. 
 
 
 

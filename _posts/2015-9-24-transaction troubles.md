@@ -11,7 +11,7 @@ Recently I've faced an interesting issue. Got transactional method saving entity
 ```java
 /* SummaryMaker */
 
-	@EventListener
+    @EventListener
     @Transactional
     public void createSummary(FileProcessedEvent event) {
         summaryRepository.save(
