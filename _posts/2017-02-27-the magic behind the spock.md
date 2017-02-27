@@ -6,9 +6,9 @@ comments: true
 Spock rulez. Writing tests has never been simpler and more pleasant. All thanks to concise and informative syntax. But how is Spock syntax made possible?
 
 Expressions like
-* __ValueProvider valueProvider = Stub()__
-* __valueProvider.provideValue() >> 21__
-* __then:__
+* ValueProvider valueProvider = Stub()
+* valueProvider.provideValue() >> 21
+* then:
 
 what makes them work? If you're interetsed follow my plan which is to focus on simple Spec like:
 ```groovy
@@ -38,25 +38,25 @@ and a present high level view of what makes it tick.
 
 Let's start with noticing that none of the expresions above are against Groovy syntax (in which Spock specifications are written).
 
-* __ValueProvider valueProvider = Stub()__
+* _ValueProvider valueProvider = Stub()_  
 Is a _MethodCallExpression_. Namely calling _Stub()_ method and assigning it to a valueProvider variable (method name starting with capital letter is only a disguise).
 
-* __valueProvider.provideValue() >> 21__
+* _valueProvider.provideValue() >> 21_  
 Is a BinaryExpression using _>>_ operator on _valueProvider.provideValue()_ and _21_
 
-* __then:__
+* _then:_  
 and 'when:' and 'given:' are Groovy labels - counstructs that (repeating after [doc](http://groovy-lang.org/semantics.html#_labeled_statements)) have no impact on the semantics of the code but can be used to make the code easier to read.
 
 So nothing against Groovy compilator here, but a little against the Groovy runtime.
 Run the above Spec without the Spock magic and 
 
-* __Stub()__
+* _Stub()_  
 will throw _InvalidSpecException_ as this is as it is defined in [MockingApi](https://github.com/spockframework/spock/blob/spock-1.0/spock-core/src/main/java/spock/lang/MockingApi.java) class
 
-* __>>__
+* _>>_  
 will be call to [DefaultGroovyMethods.rightShift(Number self, Number operand)](https://github.com/groovy/groovy-core/blob/GROOVY_2_4_3/src/main/org/codehaus/groovy/runtime/DefaultGroovyMethods.java) and not stubbing a method call
 
-* __then:__
+* _then:_  
 will just be label with no extra functionality like asserting every comparision
 
 
@@ -74,16 +74,16 @@ When Groovy compiler transforms _.groovy_ files into Java byte code, the overall
 These phases can be found in [Phases](https://github.com/groovy/groovy-core/blob/GROOVY_2_4_3/src/main/org/codehaus/groovy/control/Phases.java) class
 
 ```java
-    public static final int INITIALIZATION        = 1;   // Opening of files and such
-    public static final int PARSING               = 2;   // Lexing, parsing, and AST building
-    public static final int CONVERSION            = 3;   // CST to AST conversion
-    public static final int SEMANTIC_ANALYSIS     = 4;   // AST semantic analysis and elucidation
-    public static final int CANONICALIZATION      = 5;   // AST completion
-    public static final int INSTRUCTION_SELECTION = 6;   // Class generation, phase 1
-    public static final int CLASS_GENERATION      = 7;   // Class generation, phase 2
-    public static final int OUTPUT                = 8;   // Output of class to disk
-    public static final int FINALIZATION          = 9;   // Cleanup
-    public static final int ALL                   = 9;   // Synonym for full compilation
+public static final int INITIALIZATION        = 1;   // Opening of files and such
+public static final int PARSING               = 2;   // Lexing, parsing, and AST building
+public static final int CONVERSION            = 3;   // CST to AST conversion
+public static final int SEMANTIC_ANALYSIS     = 4;   // AST semantic analysis and elucidation
+public static final int CANONICALIZATION      = 5;   // AST completion
+public static final int INSTRUCTION_SELECTION = 6;   // Class generation, phase 1
+public static final int CLASS_GENERATION      = 7;   // Class generation, phase 2
+public static final int OUTPUT                = 8;   // Output of class to disk
+public static final int FINALIZATION          = 9;   // Cleanup
+public static final int ALL                   = 9;   // Synonym for full compilation
 ```
 Basically the whole process built from these phases can be summarized as:
 - read data from some input (source file, String script, etc)
@@ -98,7 +98,7 @@ The crucial point here is that the _AST_ is exposed not only for _Groovy's_ inte
 
 #### Spock AST transformation
 
-When _CompilationUnit_ is first created by _GroovyClassLoader_, it collects all global transformations it can find in _META-INF/services/org.codehaus.groovy.transform.ASTTransformation files._
+When _CompilationUnit_ is first created by _GroovyClassLoader_, it collects all global transformations it can find in _META-INF/services/org.codehaus.groovy.transform.ASTTransformation_ files.  
 open [org.codehaus.groovy.transform.ASTTransformation](https://github.com/spockframework/spock/blob/spock-1.0/spock-core/src/main/resources/META-INF/services/org.codehaus.groovy.transform.ASTTransformation) file in _spock-core_ jar and you'll find
 ```
 org.spockframework.compiler.SpockTransform 
@@ -120,7 +120,7 @@ which is the Spock _AST_ transformation being the entry point for the whole proc
 public class SpockTransform implements ASTTransformation
 ```
 
-_SpockTransform_ is a global transformation, meaning it will be executed once for every Groovy class being compiled (as opposite to local transformation performed only on marked classes - e.g. by an annotation).
+_SpockTransform_ is a global transformation, meaning it will be executed once for every Groovy class being compiled (as opposite to local transformation performed only on marked classes, e.g. by an annotation).  
 At the very beginning _SpockTransform_ checks if given class is derived from [Specification](https://github.com/spockframework/spock/blob/spock-1.0/spock-core/src/main/java/spock/lang/Specification.java) and if so, the tranformation process begins.
 
 
@@ -128,37 +128,37 @@ Spock steps in during _SEMANTIC_ANALYSIS_ phase. Taking into consideration only 
 
 ```
 ClassNode: MagnifyingProxySpec
-	fields:
-		[0]: name: valueProvider
-			 type: ValueProvider -> ValueProvider
-			 initialValueExpression:
-			    MethodCallExpression: Stub()
-		[1]: name: magnifyingProxy
-			 type: MagnifyingProxy -> MagnifyingProxy
-			 initialValueExpression:
-				ConstructorCallExpression: new MagnifyingProxy(valueProvider)
-	methods:
-		name: "should magnify value"
-		code:
-			statements:
-				[0]: expresion: 
-						BinaryExpression:
-							leftExpresion:  valueProvider.provideValue() 
-							rightExpresion: 21
-							operation: >>	
-					 statementLabels: given
-				[1]: expresion: 
-						DeclarationExpression:
-							leftExpresion: int result 
-							rightExpresion: magnifyingProxy.provideMagnifiedValue()	
-							operation: =
-					 statementLabels: when
-				[2]: expresion:
-						BinaryExpression:
-							leftExpresion: result
-							rightExpresion: 210
-							operation: == 
-					 statementLabels: then
+  fields:
+    [0]: name: valueProvider
+         type: ValueProvider -> ValueProvider
+         initialValueExpression:
+             MethodCallExpression: Stub()
+    [1]: name: magnifyingProxy
+         type: MagnifyingProxy -> MagnifyingProxy
+         initialValueExpression:
+             ConstructorCallExpression: new MagnifyingProxy(valueProvider)
+  methods:
+    name: "should magnify value"
+    code:
+      statements:
+        [0]: expresion: 
+               BinaryExpression:
+                 leftExpresion:  valueProvider.provideValue() 
+                 rightExpresion: 21
+                 operation: >>	
+             statementLabels: given
+        [1]: expresion: 
+               DeclarationExpression:
+                 leftExpresion: int result 
+                 rightExpresion: magnifyingProxy.provideMagnifiedValue()	
+                 operation: =
+             statementLabels: when
+        [2]: expresion:
+               BinaryExpression:
+                 leftExpresion: result
+                 rightExpresion: 210
+                 operation: == 
+             statementLabels: then
 ```
 
 &nbsp;
@@ -176,50 +176,50 @@ During the _SpockTransform_ a lot is happening.
 * As the _AST_ is rewritten, some information about original structure still needs to be kept - these are added to the new _AST_ structure in a form of annotations by [SpecAnnotator](https://github.com/spockframework/spock/blob/spock-1.0/spock-core/src/main/java/org/spockframework/compiler/SpecAnnotator.java)
 
 
-After tranformation is finished the AST tree will look like:
+After tranformation is finished the AST tree will look like:  
 (it's a simplified view, so the changes to original one are more vivid - e.g. all annotations info is removed and complex subtrees are flatten to String values)
 ```
 ClassNode: MagnifyingProxySpec
-	fields:
-		[0]: name: valueProvider
-			 type: ValueProvider -> ValueProvider
-			 initialValueExpression: null
-		[1]: name: magnifyingProxy
-			 type: MagnifyingProxy -> MagnifyingProxy
-			 initialValueExpression: null
-	methods:
-		[0]: name: "$spock_initializeFields"
-			 code:
-				statements:
-					[0]: expresion: 
-							FieldInitializationExpression:
-								leftExpresion:  valueProvider
-								rightExpresion: StubImpl('valueProvider', ValueProvider)
-								operation: =	
-					[1]: expresion: 
-							FieldInitializationExpression:
-								leftExpresion: magnifyingProxy
-								rightExpresion: new MagnifyingProxy(valueProvider)
-								operation: =
-		[1]: name: "$spock_feature_0_0"
-		     code:
-				statements:
-					[0]: expresion: 
-							DeclarationExpression:
-								leftExpresion:  $spock_valueRecorder
-								rightExpresion: new ValueRecorder()
-								operation: =	
-					[1]: expresion: 
-							MethodCallExpression: this.getSpecificationContext().getMockController().addInteraction(new InteractionBuilder(14, 13, 'valueProvider.provideValue() >> 21').addEqualTarget(valueProvider).addEqualMethodName('provideValue').setArgListKind(true).addConstantResponse(21).build())
-					[2]: expresion:
-							DeclarationExpression:
-								leftExpresion: Integer result
-								rightExpresion: magnifyingProxy.provideMagnifiedValue()
-								operation: = 
-					[3]: expresion:
-							MethodCallExpression: SpockRuntime.verifyCondition($spock_valueRecorder.reset(), 'result == 210', 20, 13, null, $spock_valueRecorder.record(2, $spock_valueRecorder.record(0, result) == $spock_valueRecorder.record(1, 210)))
-					[4]: expresion:
-							MethodCallExpression: getSpecificationContext().getMockController().leaveScope()
+  fields:
+    [0]: name: valueProvider
+         type: ValueProvider -> ValueProvider
+         initialValueExpression: null
+    [1]: name: magnifyingProxy
+         type: MagnifyingProxy -> MagnifyingProxy
+         initialValueExpression: null
+  methods:
+    [0]: name: "$spock_initializeFields"
+         code:
+           statements:
+             [0]: expresion: 
+                    FieldInitializationExpression:
+                        leftExpresion:  valueProvider
+                        rightExpresion: StubImpl('valueProvider', ValueProvider)
+                        operation: =	
+             [1]: expresion: 
+                    FieldInitializationExpression:
+                        leftExpresion: magnifyingProxy
+                        rightExpresion: new MagnifyingProxy(valueProvider)
+                        operation: =
+    [1]: name: "$spock_feature_0_0"
+         code:
+           statements:
+             [0]: expresion: 
+                    DeclarationExpression:
+                        leftExpresion:  $spock_valueRecorder
+                        rightExpresion: new ValueRecorder()
+                        operation: =	
+             [1]: expresion: 
+                    MethodCallExpression: this.getSpecificationContext().getMockController().addInteraction(new InteractionBuilder(14, 13, 'valueProvider.provideValue() >> 21').addEqualTarget(valueProvider).addEqualMethodName('provideValue').setArgListKind(true).addConstantResponse(21).build())
+             [2]: expresion:
+                    DeclarationExpression:
+                        leftExpresion: Integer result
+                        rightExpresion: magnifyingProxy.provideMagnifiedValue()
+                        operation: = 
+             [3]: expresion:
+                    MethodCallExpression: SpockRuntime.verifyCondition($spock_valueRecorder.reset(), 'result == 210', 20, 13, null, $spock_valueRecorder.record(2, $spock_valueRecorder.record(0, result) == $spock_valueRecorder.record(1, 210)))
+             [4]: expresion:
+                    MethodCallExpression: getSpecificationContext().getMockController().leaveScope()
 ```
 
 							
@@ -257,33 +257,37 @@ public class MagnifyingProxySpec extends Specification {
     }
 
     @FeatureMetadata(line = 12, blocks = [
-		[]org.spockframework.runtime.model.BlockKind.SETUPorg.codehaus.groovy.ast.AnnotationNode@138c8ce,
-		[]org.spockframework.runtime.model.BlockKind.WHENorg.codehaus.groovy.ast.AnnotationNode@7e7261e6,
-		[]org.spockframework.runtime.model.BlockKind.THENorg.codehaus.groovy.ast.AnnotationNode@34e6c430],
-		name = 'should magnify value', parameterNames = [], ordinal = 0)
+      []org.spockframework.runtime.model.BlockKind.SETUPorg.codehaus.groovy.ast.AnnotationNode@138c8ce,
+      []org.spockframework.runtime.model.BlockKind.WHENorg.codehaus.groovy.ast.AnnotationNode@7e7261e6,
+      []org.spockframework.runtime.model.BlockKind.THENorg.codehaus.groovy.ast.AnnotationNode@34e6c430],
+      name = 'should magnify value', parameterNames = [], ordinal = 0)
     public void $spock_feature_0_0() {
         Object $spock_valueRecorder = new ValueRecorder()
         this.getSpecificationContext().getMockController()
-			.addInteraction(
-				new InteractionBuilder(14, 13, 'valueProvider.provideValue() >> 21')
-					.addEqualTarget(valueProvider)
-					.addEqualMethodName('provideValue')
-					.setArgListKind(true)
-					.addConstantResponse(21)
-					.build())
+            .addInteraction(
+                new InteractionBuilder(14, 13, 'valueProvider.provideValue() >> 21')
+                    .addEqualTarget(valueProvider)
+                    .addEqualMethodName('provideValue')
+                    .setArgListKind(true)
+                    .addConstantResponse(21)
+                    .build())
         Integer result = magnifyingProxy.provideMagnifiedValue()
         SpockRuntime.verifyCondition(
-			$spock_valueRecorder.reset(), 'result == 210', 20, 13, null,
-			$spock_valueRecorder.record(2, $spock_valueRecorder.record(0, result) == $spock_valueRecorder.record(1, 210)))
+            $spock_valueRecorder.reset(), 'result == 210', 20, 13, null,
+            $spock_valueRecorder.record(2, $spock_valueRecorder.record(0, result) == $spock_valueRecorder.record(1, 210)))
         this.getSpecificationContext().getMockController().leaveScope()
     }
 }
 ```
 
 From the code above it should be clear that
-- we no longer call exception throwing __Stub()__ method but _StubImpl()_ from [SpecInternals](https://github.com/spockframework/spock/blob/spock-1.0/spock-core/src/main/java/org/spockframework/lang/SpecInternals.java) class
-- __valueProvider.provideValue() >> 21__ stubbing was replaced with [MockController](https://github.com/spockframework/spock/blob/spock-1.0/spock-core/src/main/java/org/spockframework/mock/runtime/MockController.java) interaction
-- __then:__ block was transformed to condition verification.
+- _Stub()_  
+exception throwing method has been replaced by _StubImpl()_ from [SpecInternals](https://github.com/spockframework/spock/blob/spock-1.0/spock-core/src/main/java/org/spockframework/lang/SpecInternals.java) class
+- _valueProvider.provideValue() >> 21_  
+stubbing was replaced with [MockController](https://github.com/spockframework/spock/blob/spock-1.0/spock-core/src/main/java/org/spockframework/mock/runtime/MockController.java)
+ interaction
+- _then:_  
+block was transformed to condition verification.
 
 
 
