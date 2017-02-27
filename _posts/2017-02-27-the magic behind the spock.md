@@ -223,7 +223,7 @@ ClassNode: MagnifyingProxySpec
 ```
 
 							
-Instead of describing it I think it would be best to compare source code from Groovy AST Browser before and after the transformation:
+Instead of describing it I think it would be best to compare source code from Groovy AST Browser before and after Spock the transformation:
 
 before:
 ```groovy
@@ -289,6 +289,10 @@ stubbing was replaced with [MockController](https://github.com/spockframework/sp
 - _then:_  
 block was transformed to condition verification.
 
+&nbsp;
+
+If you want to read more about AST transformations (among others) check the great [Groovy metaprogramming guide](http://groovy-lang.org/metaprogramming.html)
 
 &nbsp;
+
 
