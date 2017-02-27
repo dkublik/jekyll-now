@@ -223,7 +223,7 @@ ClassNode: MagnifyingProxySpec
 ```
 
 							
-Instead of describing it I think it would be best to compare source code from Groovy AST Browser before and after Spock the transformation:
+Instead of describing it, it would be better to compare source code from _Groovy AST Browser_ before and after the _SpockTransform_ transformation:
 
 before:
 ```groovy
