@@ -6,9 +6,9 @@ comments: true
 Spock rulez. Writing tests has never been simpler and more pleasant. All thanks to concise and informative syntax. But how is Spock syntax made possible?
 
 Expressions like
-* ValueProvider valueProvider = Stub()
-* valueProvider.provideValue() >> 21
-* then:
+* _ValueProvider valueProvider = Stub()_
+* _valueProvider.provideValue() >> 21_
+* _then:_
 
 what makes them work? If you're interetsed follow my plan which is to focus on simple Spec like:
 ```groovy
@@ -57,10 +57,10 @@ will throw _InvalidSpecException_ as this is as it is defined in [MockingApi](ht
 will be call to [DefaultGroovyMethods.rightShift(Number self, Number operand)](https://github.com/groovy/groovy-core/blob/GROOVY_2_4_3/src/main/org/codehaus/groovy/runtime/DefaultGroovyMethods.java) and not stubbing a method call
 
 * _then:_  
-will just be label with no extra functionality like asserting every comparision
+will just be a label with no extra functionality like asserting every comparision
 
 
-So somewhere between compilation and execution must exist an extension point to which Spock reaches to perfom it's tricks.
+So somewhere between a compilation and an execution must exist an extension point to which Spock reaches to perfom it's tricks.
 
 &nbsp;
 
@@ -177,7 +177,7 @@ During the _SpockTransform_ a lot is happening.
 
 
 After tranformation is finished the AST tree will look like:  
-(it's a simplified view, so the changes to original one are more vivid - e.g. all annotations info is removed and complex subtrees are flatten to String values)
+(it's a simplified view, so the changes to original are more vivid - e.g. all annotations info is removed and complex subtrees are flatten to String values)
 ```
 ClassNode: MagnifyingProxySpec
   fields:
@@ -290,10 +290,5 @@ stubbing was replaced with [MockController](https://github.com/spockframework/sp
 block was transformed to condition verification.
 
 
-
-
-
-
-
-
 &nbsp;
+
