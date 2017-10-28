@@ -8,7 +8,7 @@ Article explains how to send SpringBoot and Netflix Servo metrics to AWS CloudWa
 
 #### TL;DR
 
-If you are not interested how and why and just want to make it work do the following:
+If you are not interested in how and why and just want to make it work do the following:
 
 add dependencies (here build.gradle)
 
@@ -248,8 +248,8 @@ class SomeTrafficGenerator {
 
 Run the application one more time and enjoy plenty new metrics in CloudWatch!
 
-![Hystrix Metrics namespace in CloudWatch]({{ site.baseurl }}/images/2017-10-28-springboot-metrics/hystrix-metrics.png "Hystrix Metrics namespace in CloudWatch")
-Hystrix Metrics namespace in CloudWatch
+![Hystrix metrics in CloudWatch]({{ site.baseurl }}/images/2017-10-28-springboot-metrics/hystrix-metrics.png "Hystrix metrics in CloudWatch")
+Hystrix metrics in CloudWatch
 
 &nbsp;
 
