@@ -25,7 +25,6 @@ dependencies {
 
 ```
 cloud.aws.cloudwatch.namespace=m3trics
-
 ```
 
 That's it unless you are interested in why and how it works - then please continue reading :).
