@@ -245,7 +245,7 @@ class SomeTrafficGenerator {
 
 Run the application one more time and enjoy plenty new metrics in CloudWatch!
 
-![hystrix]({{ site.baseurl }}/images/2017-10-28-springboot-metrics/hystrix-metrics.png "hystrixh")
+![Hystrix Metrics namespace in CloudWatch]({{ site.baseurl }}/images/2017-10-28-springboot-metrics/hystrix-metrics.png "Hystrix Metrics namespace in CloudWatch")
 
 
 &nbsp;
