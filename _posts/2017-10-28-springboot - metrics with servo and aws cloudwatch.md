@@ -5,75 +5,76 @@ comments: true
 ---
 Article explains how to send SpringBoot and Netflix Servo metrics to AWS CloudWatch.
 
-&nbsp;
 
 #### TL;DR
 
-dependencies (here build.gradle)
+If you are not interested how and why and just want to make it work do the following:
+
+add dependencies (here build.gradle)
 
 ```groovy
 dependencies {
-	compile('org.springframework.cloud:spring-cloud-starter-aws')
-	compile('org.springframework.cloud:spring-cloud-aws-actuator')
-    compile('com.netflix.servo:servo-core') // added automatically with Eureka client
+    compile('org.springframework.cloud:spring-cloud-starter-aws')
+    compile('org.springframework.cloud:spring-cloud-aws-actuator')
+    compile('com.netflix.servo:servo-core')
     compile('org.aspectj:aspectjweaver')
 }
 ```
 
-application.properties
+set namespace name by property (application.properties)
 
 ```
-cloud.aws.cloudwatch.namespace=m3trics	// namespace that will be used in AWS CloudWatch
+cloud.aws.cloudwatch.namespace=m3trics
 
 ```
 
-That's it. If You are interested why and how - please continue reading :).
+That's it. If you are interested why and how it works - please continue reading :).
 You can also check and follow everything in [working code](https://github.com/dkublik/m3trics)
 
 &nbsp;
 
 #### SpringBoot Actuator
 
-It's super easy to enable some metrics with [Spring-Boot Actuator](https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-metrics.html)
+It's super easy to enable some metrics with [Spring Boot Actuator](https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-metrics.html)
 
-So let's just create SpringBoot project with just two dependencies:
+So let's create SpringBoot project with two dependencies:
 
 ```groovy
 compile('org.springframework.boot:spring-boot-starter-web')
 compile('org.springframework.boot:spring-boot-starter-actuator')
 ```
 
-and set
+and in application.properties set
 
 ```
 management.security.enabled=false
 ```
 
-in application.properties so that we are authorized to access all protected actuator endpoints (you may reconsider it in production)
+so that we are authorized to access all protected actuator endpoints (you may reconsider it in production)
 
-Now launch the app try:
-
-http://localhost:8080/application/metrics
+Now launch the app and try: [http://localhost:8080/application/metrics](http://localhost:8080/application/metrics)
 
 and we will see some metrics like:
 mem, processors, heap, etc...
 
-Check _org.springframework.boot.actuate.endpoint.PublicMetrics_ interface and it's class hierarchy and you will see providers for all presented metrics.
+Check _org.springframework.boot.actuate.endpoint.PublicMetrics_ interface and it's class hierarchy to find providers for all presented metrics.
 
 &nbsp;
 
 #### CounterService & GaugeService
 
-One of the PublicMetrics providers is special - MetricReaderPublicMetrics - because it reads all metrics registered by CounterService and GaugeService.
+One of the _PublicMetrics_ providers is special - _MetricReaderPublicMetrics_ - because it reads all metrics registered by _CounterService_ and _GaugeService_.
 
 What are they:
+
 CounterService - registers tracks just inreasing a counter (so can be used to number of requests, pages visits, etc)
+
 GaugeService - can store any value (it's not incremental - just set), so it's application may vary from from measuring time to showing info about threads, conntections, etc.
 
 These services are used in many places.
 
 For example - for every request to any endpoint at least two metrics are registered,
-even for http://localhost:8080/application/metrics we have:
+even for [http://localhost:8080/application/metrics](http://localhost:8080/application/metrics) we have:
 
 ```
 gauge.response.application.metrics: 0.0
@@ -82,7 +83,9 @@ counter.status.200.application.metrics: 7
 
 where 
 _application.metrics_ is taken from url path -> _/application/metrics_
+
 _counter.status.200_ means number of hits to this particular endpoint with response code = 200
+
 _gauge.response_ - is last response time
 
 
@@ -111,9 +114,9 @@ class FavoritesNumberController {
 ```
 
 
-Now when we hit http://localhost:8080/favorites?number=11
+Now when we hit [http://localhost:8080/favorites?number=11](http://localhost:8080/favorites?number=11)
 
-and We got:
+and we got:
 
 ```
 gauge.response.favorites: 24.0,
