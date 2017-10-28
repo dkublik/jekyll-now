@@ -184,9 +184,12 @@ Now access different endpoints in app and with few seconds delay you will be abl
 Just login to aws console, and to CloudWatch -> m3trics (remember the _cloud.aws.cloudwatch.namespace=m3trics property_)
 
 ![Registered Metrics namespace]({{ site.baseurl }}/images/2017-10-28-springboot-metrics/namespace.png "Registered Metrics namespace in CloudWatch")
+Registered Metrics namespace in CloudWatch
 
+&nbsp;
 
 ![Spring Boot basic metrics in CloudWatch]({{ site.baseurl }}/images/2017-10-28-springboot-metrics/basic-metrics.png "Spring Boot basic metrics in CloudWatch")
+Spring Boot basic metrics in CloudWatch
 
 &nbsp;
 
@@ -246,7 +249,7 @@ class SomeTrafficGenerator {
 Run the application one more time and enjoy plenty new metrics in CloudWatch!
 
 ![Hystrix Metrics namespace in CloudWatch]({{ site.baseurl }}/images/2017-10-28-springboot-metrics/hystrix-metrics.png "Hystrix Metrics namespace in CloudWatch")
-
+Hystrix Metrics namespace in CloudWatch
 
 &nbsp;
 
