@@ -5,7 +5,7 @@ comments: true
 ---
 Article explains how to send Spring Boot and Netflix Servo metrics to AWS CloudWatch.
 Morover it describes mechanisms making making it happen.
-It also mentions problems I run into trying to do the same with Spring Bootand Spectator.
+It also mentions problems I run into trying to do the same with Spring Boot and Spectator.
 
 
 #### TL;DR
