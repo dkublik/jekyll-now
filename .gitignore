@@ -8,3 +8,11 @@ Gemfile
 Gemfile.lock
 node_modules
 package.json
+
+.gradle
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
