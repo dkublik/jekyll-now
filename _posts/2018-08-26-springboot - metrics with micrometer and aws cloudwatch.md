@@ -118,9 +118,10 @@ App demonstrates that dozens of metrics are added automatically by Spring Boot -
 &nbsp;
 
 I also added one custom metric - _luckies.current_ (check [LuckyNumbersController](https://github.com/dkublik/micrometer-aws-example/blob/master/src/main/java/pl/dk/m3trics2/LuckyNumbersController.java)) which just stores last lucky number that was generated.
-(keep in mind that not all generated numbers will be send to CloudWatch - as gauge metrics used here is probed peridically - details can again be found in [micrometer docs](https://micrometer.io/docs))
 
-![Last generated lucky number]({{ site.baseurl }}/images/2018-08-26-springboot-metrics2/metric-current-lucky.png "Last generated lucky number")
+![Last generated lucky number]({{ site.baseurl }}/images/2018-08-26-springboot-metrics2/metric-current-lucky.png "Last generated lucky number")  
+
+(keep in mind that not all generated numbers will be send to CloudWatch - as gauge metrics used here is probed peridically - details can again be found in [micrometer docs](https://micrometer.io/docs))
 
 &nbsp;
 
