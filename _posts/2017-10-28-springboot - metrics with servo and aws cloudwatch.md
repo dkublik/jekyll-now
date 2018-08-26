@@ -7,6 +7,8 @@ Article explains how to send Spring Boot and Netflix Servo metrics to AWS CloudW
 Morover it describes mechanisms making it happen.
 It also mentions problems I run into trying to do the same with Spring Boot and Spectator.
 
+The article desribes situation before and is not aplicable to Spring Boot 2.0 GA.  
+For metrics in Spring Boot 2.0 check [here](/springboot-metrics-with-micrometer-and-aws-cloudwatch/)
 
 #### TL;DR
 
