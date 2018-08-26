@@ -16,7 +16,6 @@ If you are not interested in why and just want to make Spring Boot work with AWS
 
 ```groovy
 dependencies {
-    compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.cloud:spring-cloud-starter-aws')
     compile('io.micrometer:micrometer-registry-cloudwatch:1.0.6')
@@ -58,7 +57,7 @@ Setting up Micrometer with Spring Boot is super easy and it's mostly just adding
 Study the list however and you will not find CloudWatch there. Still, the registry exists and can be found both in [repo](https://repo.spring.io/libs-release/io/micrometer/) and 
 [github](https://github.com/micrometer-metrics/micrometer/tree/master/implementations) waiting to be used.
 
-When making particular metric system (like e.g. datadog) work with Spring boot through micrometer all required components can be found in two places:
+When making particular metric system (like e.g. datadog) work with Spring boot through micrometer - required components can be found in two places:
 
 * _micrometer-registry-datadog.jar_ (in case of datadog) - containing Spring Boot independent meter registry and utils
 
@@ -69,7 +68,7 @@ Situation with CloudWatch however is a little different and we won't find it's A
 The thing is - when creating metrics exporter for CloudWatch we will need Amazon CloudWatch client. With region providers, detecting if app is running in the cloud or not, login profiles, etc - such a client is not a trivial piece to write. Luckilly everything is already written - but not in Spring Boot but in Spring Cloud.  
 Because it's Spring Cloud that should depend on Spring Boot, not the other way around - _CloudWatchExportAutoConfiguration_ can't be put together with other systems in Spring Boot's actuator. So to use it we need to add one more dependency:
 
-* spring-cloud-aws-autoconfigure.jar  
+* _spring-cloud-aws-autoconfigure.jar_  
 (spring-boot-actuator-autoconfigure.jar is still needed because of classes like StepRegistryProperties)
 
 
@@ -111,7 +110,7 @@ App demonstrates that dozens of metrics are added automatically by Spring Boot -
 
 &nbsp;
 
-* http.server.requests.count - how many request where made in one minute
+* http.server.requests.count - how many requests where made in one minute
 
 ![Number of requests in one minute]({{ site.baseurl }}/images/2018-08-26-springboot-metrics2/metric-count.png "Number of requests in one minute")
 
@@ -121,7 +120,7 @@ I also added one custom metric - _luckies.current_ (check [LuckyNumbersControlle
 
 ![Last generated lucky number]({{ site.baseurl }}/images/2018-08-26-springboot-metrics2/metric-current-lucky.png "Last generated lucky number")  
 
-(keep in mind that not all generated numbers will be send to CloudWatch - as gauge metrics used here is probed peridically - details can again be found in [micrometer docs](https://micrometer.io/docs))
+(keep in mind that not all generated numbers will be sent to CloudWatch - as gauge metric used here is probed peridically - details can again be found in [micrometer docs](https://micrometer.io/docs/concepts#_gauges))
 
 &nbsp;
 
