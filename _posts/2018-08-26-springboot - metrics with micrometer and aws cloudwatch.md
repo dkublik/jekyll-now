@@ -4,7 +4,7 @@ title: SpringBoot - Metrics with Micrometer and AWS CloudWatch
 comments: true
 ---
 Some time ago I wrote a blog about how to configure CloudWatch metrics Spring Boot. It was all before micrometer and depended on Netflix Servo Metrics.
-Time was slowly passing and civilizations prospered but it's still difficult to find info on how to make Spring Boot work with Micrometer CloudWatch.
+Time was slowly passing and civilizations prospered but it's still difficult to find info on how to make Spring Boot work with Micrometer CloudWatch.  
 So here it goes.
 
 
@@ -41,7 +41,7 @@ You can also check and follow everything in the [working code](https://github.co
 
 It's not my goal here to describe Mirometer itfself, neither the concept of different metrics - as all the info can be easilly find in [micrometer docs](https://micrometer.io/docs).
 
-Setting up Micrometer with Spring Boot is super easy and it's mostly just adding a specified registry as a dependency, where the registries are different metrics systems that again are listed on [micrometer page](https://micrometer.io/docs).
+Setting up Micrometer with Spring Boot is super easy and it's mostly just adding a specified registry as a dependency, where the registries are different metrics systems that again are listed on [micrometer page](https://micrometer.io/docs):
 
 * Atlas
 * Datadog
@@ -58,7 +58,7 @@ Setting up Micrometer with Spring Boot is super easy and it's mostly just adding
 Study the list however and you will not find CloudWatch there. Still, the registry exists and can be found both in [repo](https://repo.spring.io/libs-release/io/micrometer/) and 
 [github](https://github.com/micrometer-metrics/micrometer/tree/master/implementations) waiting to be used.
 
-When making particualar metric system (like e.g. datadog) work with Spring boot through micrometer all required componets can be found in two places:
+When making particular metric system (like e.g. datadog) work with Spring boot through micrometer all required components can be found in two places:
 
 * _micrometer-registry-datadog.jar_ (in case of datadog) - containing Spring Boot independent meter registry and utils
 
@@ -66,7 +66,7 @@ When making particualar metric system (like e.g. datadog) work with Spring boot 
 
 
 Situation with CloudWatch however is a little different and we won't find it's AutoConfiguration in actuator jar.  
-The thing is - when creating metrics exporter for CloudWath we will need Amazon CloudWatch client. With region providers, detecting if app is running in the cloud or not, login profiles, etc - such a client is not a trivial piece to write. Luckilly everything is already written - but not in Spring Boot but in Spring Cloud.  
+The thing is - when creating metrics exporter for CloudWatch we will need Amazon CloudWatch client. With region providers, detecting if app is running in the cloud or not, login profiles, etc - such a client is not a trivial piece to write. Luckilly everything is already written - but not in Spring Boot but in Spring Cloud.  
 Because it's Spring Cloud that should depend on Spring Boot, not the other way around - _CloudWatchExportAutoConfiguration_ can't be put together with other systems in Spring Boot's actuator. So to use it we need to add one more dependency:
 
 * spring-cloud-aws-autoconfigure.jar  
@@ -95,8 +95,8 @@ management.metrics.export.cloudwatch.batchSize=20
 ```
 
 To undersand it you need to know that metrics are sent to CloudWatch asynchronously in batches and Amazon CloudWatch client has a limit of max _20_ metrics sent in single batch.
-[io.micrometer.cloudwatch.CloudWatchConfig](https://github.com/micrometer-metrics/micrometer/blob/master/implementations/micrometer-registry-cloudwatch/src/main/java/io/micrometer/cloudwatch/CloudWatchConfig.java  handles it corretly),
-but then actual properties are taken from [org.springframework.cloud.aws.autoconfigure.metric.CloudWatchProperties](https://github.com/spring-cloud/spring-cloud-aws/blob/master/spring-cloud-aws-autoconfigure/src/main/java/org/springframework/cloud/aws/autoconfigure/metrics/CloudWatchProperties.java) and this one just takes the _batchSize_ from property or sets default value to _10000_ not caring about AWS restriction.
+[CloudWatchConfig](https://github.com/micrometer-metrics/micrometer/blob/master/implementations/micrometer-registry-cloudwatch/src/main/java/io/micrometer/cloudwatch/CloudWatchConfig.java) handles it corretly,
+but then actual properties are taken from [CloudWatchProperties](https://github.com/spring-cloud/spring-cloud-aws/blob/master/spring-cloud-aws-autoconfigure/src/main/java/org/springframework/cloud/aws/autoconfigure/metrics/CloudWatchProperties.java) and this one just takes the _batchSize_ from property or sets default value to _10000_ not caring about AWS restriction.
 
 
 #### Example metrics
